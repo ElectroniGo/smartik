@@ -14,11 +14,22 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/smartik.git
+   git clone https://github.com/algoblue/smartik.git
+   ```
+
+   Or, if you've setup your SSH keys (preferrable)
+
+   ```bash
+   git clone git@github.com:algoblue/smartik.git
+   ```
+
+   then
+
+   ```bash
    cd smartik
    ```
 
-2. **Install dependencies:**
+1. **Install dependencies:**
 
    ```bash
    pnpm install
@@ -31,3 +42,5 @@ To run the development server, use the following command:
 ```bash
 pnpm dev
 ```
+
+> _We will update this section with the relevant open port numbers to run the application
