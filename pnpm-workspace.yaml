@@ -1,0 +1,4 @@
+packages:
+  - src/server/*
+  - src/client/*
+  - src/shared/*

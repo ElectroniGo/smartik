@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.com/schema.v2.json",
+  "globalDependencies": [".env*", "!.env.example"],
+  "daemon": true,
+  "tasks": {
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "persistent": true,
+      "cache": false
+    }
+  }
+}
