@@ -28,7 +28,7 @@ corepack enable pnpm
 corepack prepare pnpm@10.9.0 # version must be exactly this or higher to avoid compatibility with Turborepo
 ```
 
-If your get an error setting up using `corepack`, you can alternatively just use npm:
+If you get an error setting up using `corepack`, you can alternatively just use npm:
 
 ```bash
 npm install -g pnpm@10.9.0
