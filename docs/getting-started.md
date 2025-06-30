@@ -15,8 +15,8 @@ We're using Node.js as the tooling that the entire solution will be built on top
 
 ### [PNPM](https://pnpm.io/)
 
-We're using the PNPM package manager to govern our project's dependencies. This is just like the regular npm. they operate the same.
-PNPM just approaches dependency management for multi-package repos a lot more cleanly than npm, I'd say. _(creates a dedicated `node_modules` folder for every package that has its own `package.json`)_
+We're using the PNPM package manager to govern our project's dependencies. This is similar to the regular npm, as they operate in the same way.
+PNPM provides a more efficient approach to dependency management for multi-package repositories. _(It creates a dedicated `node_modules` folder for every package that has its own `package.json`.)_
 
 To enable/install it, run:
 
