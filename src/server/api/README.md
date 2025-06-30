@@ -21,13 +21,23 @@ Before you begin, ensure you have the following installed on your system:
 2.  **Start the Services:**
     Run the following command from this directory (`/api`) to build and start all the services in the background.
     ```bash
-    pnpm run dev
+    pnpm run start
     ```
 
 3.  **Access the Services:**
     Once the containers are running, you can access the services at these default URLs:
     -   **Convex Backend:** `http://127.0.0.1:3210` (Your client application should connect to this URL)
     -   **Convex Dashboard:** `http://127.0.0.1:6791` (Use this to view your data, logs, and functions)
+    
+    > To access the convex dashboard you need to have an admin key.
+    > 
+    > To get one, first make sure you've run step 2. Then, run the following command:
+    > 
+    > ```bash
+    > docker exec api-backend-1 bash ./generate_admin_key.sh
+    > ```
+    > Copy the admin key & paste it when prompted in the dashboard's login form.
+    
 
 ## Configuration
 
