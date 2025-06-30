@@ -16,7 +16,7 @@ We're using Node.js as the tooling that the entire solution will be built on top
 ### [PNPM](https://pnpm.io/)
 
 We're using the PNPM package manager to govern our project's dependencies. This is just like the regular npm. they operate the same.
-PNPM just approaches dependency management for multi-package repos a lot more cleanly than npm, I'd say. _(creates a dedicated `node_modules` folder for every package that has it's own `package.json`)_
+PNPM just approaches dependency management for multi-package repos a lot more cleanly than npm, I'd say. _(creates a dedicated `node_modules` folder for every package that has its own `package.json`)_
 
 To enable/install it, run:
 
@@ -28,7 +28,7 @@ corepack enable pnpm
 corepack prepare pnpm@10.9.0 # version must be exactly this or higher to avoid compatibilty with Turborepo
 ```
 
-If your get an error setting up using `corepack`, your alternatively just use npm:
+If your get an error setting up using `corepack`, you can alternatively just use npm:
 
 ```bash
 npm install -g pnpm@10.9.0
