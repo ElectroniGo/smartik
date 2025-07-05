@@ -1,0 +1,7 @@
+{
+  "name": "@repo/biome-config",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

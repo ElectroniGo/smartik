@@ -1,0 +1,13 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": ["**/.env*", "!**/.env.example", "!**/*.md"],
+  "tasks": {
+    "dev": {
+      "cache": true,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  }
+}

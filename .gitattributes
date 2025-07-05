@@ -1,0 +1,31 @@
+* text=auto
+
+*.go eol=lf
+*.js eol=lf
+*.jsx eol=lf
+*.ts eol=lf
+*.tsx eol=lf
+
+*.json eol=lf
+*.yaml eol=lf
+*.yml eol=lf
+*.md eol=lf
+*.toml eol=lf
+
+.gitattributes eol=lf
+.gitignore eol=lf
+Dockerfile eol=lf
+go.mod eol=lf
+go.sum eol=lf
+package.json eol=lf
+pnpm-workspace.yaml eol=lf
+pnpm-lock.yaml eol=lf
+
+*.sh eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
