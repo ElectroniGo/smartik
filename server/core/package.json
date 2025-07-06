@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "go run .",
-    "build": "go build ."
+    "build": "go build .",
+    "install": "go mod tidy"
   }
 }
