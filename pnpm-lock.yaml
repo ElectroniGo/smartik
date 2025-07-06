@@ -36,6 +36,8 @@ importers:
         specifier: workspace:*
         version: link:../../shared/biome-config
 
+  server/core: {}
+
   shared/biome-config: {}
 
 packages:
