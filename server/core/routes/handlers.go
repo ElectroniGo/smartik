@@ -51,7 +51,7 @@ func onTrigger(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, echo.Map{
 		"success": true,
-		"detail":  "Triggered successfully",
+		"detail":  "Text extracted successfully",
 		"data":    scriptText,
 	})
 }
