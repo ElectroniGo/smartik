@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"image/png"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -12,19 +11,19 @@ import (
 	"github.com/otiai10/gosseract/v2"
 )
 
-func ReadScript(url string) []byte {
+func ReadScript(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("Failed to fetch PDF: %v", err)
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	buf, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalf("Failed to read PDF: %v", err)
+		return nil, err
 	}
 
-	return buf
+	return buf, nil
 }
 
 func ExtractText(pdfBuf []byte) (string, error) {
