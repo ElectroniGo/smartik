@@ -2,16 +2,17 @@ package textextractor
 
 import (
 	"bytes"
-	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gen2brain/go-fitz"
+	"github.com/otiai10/gosseract/v2"
 )
 
-func readScript(url string) []byte {
+func ReadScript(url string) []byte {
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Failed to fetch PDF: %v", err)
@@ -26,14 +27,14 @@ func readScript(url string) []byte {
 	return buf
 }
 
-func extractText(pdfBuf []byte) (string, error) {
+func ExtractText(pdfBuf []byte) (string, error) {
 	document, err := fitz.NewFromMemory(pdfBuf)
 	if err != nil {
 		return "", err
 	}
-	document.Close()
+	defer document.Close()
 
-	var _ strings.Builder // Store extracted text
+	var scriptTextBuf strings.Builder
 
 	for i := 0; i < document.NumPage(); i++ {
 		img, err := document.Image(i)
@@ -42,14 +43,25 @@ func extractText(pdfBuf []byte) (string, error) {
 		}
 
 		buf := new(bytes.Buffer)
-		if err := jpeg.Encode(buf, img, nil); err != nil {
+		if err := png.Encode(buf, img); err != nil {
 			return "", err
 		}
 
-		// create tesseract client
-		// read text from image buffer
-		// return extracted text
+		client := gosseract.NewClient()
+		client.SetLanguage("eng")
+		defer client.Close()
+
+		if err := client.SetImageFromBytes(buf.Bytes()); err != nil {
+			return "", err
+		}
+
+		text, err := client.Text()
+		if err != nil {
+			return "", err
+		}
+
+		scriptTextBuf.WriteString(text)
 	}
 
-	return "", nil
+	return scriptTextBuf.String(), nil
 }
