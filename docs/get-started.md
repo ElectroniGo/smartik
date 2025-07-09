@@ -57,6 +57,12 @@ The project is a monorepo containing Go, and JavaScript/TypeScript code.
 This command will install all dependencies for the entire project using `pnpm` and run modified `install` scripts for each service that isn't JS/TS.
 
 ```bash
+# Install the build tool (Turbo)
+npm install --global turbo@2
+```
+
+```bash
+# Install project dependencies
 pnpm install
 ```
 
