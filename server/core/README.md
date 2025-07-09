@@ -2,57 +2,15 @@
 
 This is the service that is responsible for processing PDFs, images & text extraction.
 
+> All commands in this file assume, you are running them from the root of this service. (`server/core/`) if not, they won't run properly.
+
 ## Prerequisites
 
 This guide assumes you have completed the setup described in [`docs/get-started.md`](../../docs/get-started.md) to prepare your development environment.
 
-## Dependencies
-
-### Tesseract OCR Installation
-
-This service requires Tesseract OCR for text extraction from images and scanned PDFs.
-
-#### Ubuntu/Debian (Linux mint as well)
-```bash
-# Update package list
-sudo apt update
-```
-
-```bash
-# Install Tesseract and development libraries
-sudo apt install tesseract-ocr libtesseract-dev libleptonica-dev tesseract-ocr-eng
-```
-
-```bash
-# Verify installation
-tesseract --version
-tesseract --list-langs
-```
-
-#### Fedora
-```bash
-sudo dnf update
-```
-
-```bash
-# Install Tesseract and development libraries
-sudo dnf install tesseract tesseract-devel tesseract-langpack-eng
-```
-
-```bash
-# Verify installation
-tesseract --version
-tesseract --list-langs
-```
-
 ### Go Dependencies
 
-> Make sure you run all the go commands while within the root of the
-> core service in [`server/core/`](../../server/core/)
-
-Install the required Go packages:
-
-> Running `pnpm install` as indicated by `get-started.md` will run this command for you but you are welcome to run it again just in case.
+Running `pnpm install` as indicated by `get-started.md` will run this command for you but you are welcome to run it again just in case.
 
 ```bash
 # Install PDF processing library
@@ -70,6 +28,8 @@ go mod tidy
    go run main.go
    ```
 
+   The server will be accessible at [http://localhost:1323] if you do not change the default `PORT` value set in [`.env.example`](./env.example)
+
 ## Configuration
 
 The service requires a PDF URL to be configured. Check the `config` package for available configuration options.
@@ -77,13 +37,12 @@ The service requires a PDF URL to be configured. Check the `config` package for 
 ## Troubleshooting
 
 ### Tesseract Not Found
-Ensure Tesseract is properly installed and accessible:
+Ensure Tesseract is properly installed and accessible (refer to [docs/getting-started.md](../../docs/get-started.md#2-install-dependencies)):
+
 ```bash
 which tesseract
 tesseract --version
 ```
-
-If not found, reinstall following the installation steps above.
 
 ### No Text Extracted
 If OCR returns empty results:
@@ -94,7 +53,29 @@ If OCR returns empty results:
 
 ## API Endpoints
 
-*TODO: Document API endpoints when web server is enabled*
+### POST /trigger
+
+**Input:**
+
+```json
+{
+  "url": "link-to-online-pdf"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "detail":  "Text extracted successfully",
+  "data":    "text data extracted from pdf",
+}
+```
+
+or
+
+Response with `success: false` and detail information
 
 ## Testing
 
