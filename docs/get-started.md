@@ -39,43 +39,64 @@ git clone git@github.com:algoblue/smartik.git
 cd smartik
 ```
 
+> **IMPORTANT!** Open the the project folder in VSCode. A popup should appear in the bottom right, prompting you to install the recommended extensions for this workspace. **YES, DO IT**.
+>
+> Those extension will help maintain great code quality and consistent style (Biomejs, Golang extensions). Others will will make it easier to work with docker and go.
+>
+> **Golang** has more tools that need to be installed to maintain consistent code style. Once VSCode is open:
+> 1. Open the command pallete (CTRL + SHIFT + P)
+> 2. Type "go install/update"
+> 3. Choose the first option
+> 3. Wait for a popup that will ask you to select which tools to install. and select all of them.
+> 4. The output tab will show up at the bottom logging the progress. Wait until you see  message that says all tools have been install successfully.
+
 ### 2. Install Dependencies
 
-The project is a monorepo containing Go, Python, and JavaScript code.
+The project is a monorepo containing Go, and JavaScript/TypeScript code.
 
-This command will install all dependencies for the entire project services using `pnpm` and run modified `install` scripts for each service.
+This command will install all dependencies for the entire project using `pnpm` and run modified `install` scripts for each service that isn't JS/TS.
 
 ```bash
+# Install the build tool (Turbo)
+npm install --global turbo@2
+```
+
+```bash
+# Install project dependencies
 pnpm install
 ```
 
 ## Running the Project
 
-The most straightforward way to run the entire application stack is with Docker Compose. This handles building the containers for each service and running them together in an orchestrated way.
+After installing all necassary dependencies, running this command from the root will run all dev servers of the available servers. Refer to each service's `README.md` for the opened ports and availabe services.
 
 ```bash
-# This command will all development servers
 pnpm dev
 ```
 
+*Running this command will run the [`docker-compose.yaml`](../docker-compose.yaml) files that which will build docker containers for all available services in this project and run them as though they are in a production envrionment* (Coming Soon)
+
 ```bash
-# This command will build the images if they don't exist and start all services in production mode locally
 pnpm start
 ```
 
-Once either command finishes, the application services will be running and accessible on their configured ports. You can view logs for all services directly in your terminal.
+Docker creates certain assets for the system to run all together while mimicing a aproduction environment, these include volumes and networks.
 
-To stop all the running services run:
+Should you want to stop the run "production" instance run this command:
 
 ```bash
-# This command will stop all running services but still keep all their data, virtual networks, etc.
+# Run this to stop servers but keep all its assets
 docker compose down
 ```
 
+or
+
 ```bash
-# This command will stop all running services and clean up after them, removing all their data, virtual networks, etc.
-docker compose down -v
+# Run this to stop servers and discard all its assets as well
+docker compose docker -v
 ```
+
+Once either command finishes, the application services will be running and accessible on their configured ports. You can view logs for all services directly in your terminal.
 
 ## What's Next?
 
@@ -83,5 +104,4 @@ You're all set up! Now that your environment is ready, here are some other docum
 
 *   [**Architecture Overview:**](./architecture.md) To understand how the different parts of the project fit together.
 *   [**Contributing Guide:**](./contributing.md) For guidelines on how to contribute to the project effectively.
-*   [**Deployment Guide:**](./deployment.md) For guidelines on the deployment of the project using docker compose.
 

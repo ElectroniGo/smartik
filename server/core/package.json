@@ -1,0 +1,10 @@
+{
+  "name": "core",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "go run .",
+    "build": "go build .",
+    "install": "go mod tidy"
+  }
+}

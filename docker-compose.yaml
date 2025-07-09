@@ -1,0 +1,8 @@
+services:
+  text-extraction:
+    container_name: text-extraction
+    build: ./server/core
+    env_file:
+      - ./server/core/.env.compose
+    ports:
+      - "1323:1323"

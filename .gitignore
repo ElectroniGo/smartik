@@ -18,6 +18,7 @@ node_modules/
 # dotenv environment variable files
 .env*
 !.env.example
+!.env.compose
 
 # Next.js build output
 .next
