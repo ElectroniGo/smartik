@@ -51,7 +51,7 @@ The most straightforward way to run the entire application stack is with Docker 
 
 ### For Development
 
-Look at the `README.md` of the specific service/app you would like to work on. There your will find the evironment variables you need to set & the services the dev server relies on (e.g a running postgres or redis database server)
+Look at the `README.md` of the specific service/app you would like to work on. There you will find the environment variables you need to set & the services the dev server relies on (e.g., a running postgres or redis database server)
 
 ```bash
 # Run all development servers
