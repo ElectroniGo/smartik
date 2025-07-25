@@ -81,7 +81,7 @@ func main() {
 				"time":   time.Now().Format(time.RFC3339),
 				"uptime": string(fmt.Sprintf("%d Hours, %d Minutes, %d Seconds",
 					int(t.Abs().Hours()),
-					int(t.Abs().Hours()),
+					int(t.Abs().Minutes()),
 					int(t.Abs().Seconds()),
 				)),
 			})
