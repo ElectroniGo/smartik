@@ -39,7 +39,10 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Warnf("Failed to load config: %v (Using defaults)", err)
+	}
 
 	// Database connection
 	db, err := postgres.NewConnection(cfg.PostgresURI)
