@@ -8,7 +8,7 @@ Before you begin, please ensure you have the following software installed on you
 
 | Software | Version Requirement | Notes |
 | :--- | :--- | :--- |
-| [**Go**](https://go.dev/install) | `v1.24.x` | Required for the core & API services. (If your version is not of `1.24` see the [Go managed version installation guide](https://go.dev/mange-install)) |
+| [**Go**](https://go.dev/doc/install) | `v1.24.x` | Required for the core & API services. (If your version is not of `1.24` see the [Go managed version installation guide](https://go.dev/doc/manage-install)) |
 | [**Node.js**](https://nodejs.org/download) | `v22.15 +` | The project uses `pnpm` which will automatically manage and use this version. (Preferred installation is through [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)) |
 | [**Docker**](https://docs.docker.com/engine/install/) | `v28.x` | Required for running the application stack via Docker Compose. (Preferred installation is through install [Docker Desktop](https://docs.docker.com/desktop/)) |
 | [**Air**](https://github.com/air-verse/air?tab=readme-ov-file#installation) | `v1.62.x` | (Optional) Used for live reloading in the package & serives written in Go |
