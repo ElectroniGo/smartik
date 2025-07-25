@@ -1,13 +1,32 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "globalDependencies": ["**/.env*", "!**/.env.example", "!**/*.md"],
+  "globalDependencies": [
+    ".env*",
+    "!.env.example",
+    "!.env.compose",
+    "!README.md",
+    "!LICENSE",
+    "!docs",
+    "!.vscode",
+    "!.husky",
+    "!.github"
+  ],
   "tasks": {
     "dev": {
-      "cache": true,
+      "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"]
+    },
+    "lint": {},
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
+    },
+    "format": {
+      "cache": false
     }
   }
 }
