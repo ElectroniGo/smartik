@@ -53,6 +53,15 @@ The most straightforward way to run the entire application stack is with Docker 
 
 Look at the `README.md` of the specific service/app you would like to work on. There you will find the environment variables you need to set & the services the dev server relies on (e.g., a running postgres or redis database server)
 
+> Make sure you run all scripts in the [`scripts`](../scripts/) folder from the root of the repo. (The same directory where `pnpm-lock.yaml` is)
+
+Create all the default `.env` files in all apps & services in the repo
+
+```bash
+# Makes the script executable & runs it
+chmod +x ./scripts/init_dotenv.sh && ./scripts/init_dotenv.sh
+```
+
 ```bash
 # Run all development servers
 pnpm dev
