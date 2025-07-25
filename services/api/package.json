@@ -1,0 +1,13 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "air -c ./.air.toml",
+    "build": "go build -o ./build/api ./cmd/api/",
+    "test": "go test -v ./... -coverprofile=coverage.out",
+    "lint": "golangci-lint run --fix",
+    "format": "go fmt ./...",
+    "prepare": "go mod tidy"
+  }
+}
