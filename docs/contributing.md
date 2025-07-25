@@ -10,7 +10,7 @@ Ensure you have the [necessary prerequisites](./get-started.md#prerequisites) an
 
 ### 1. Code
 
-Ensure that your code is as readable as possible. In sections where necessary, include relevant comments to simpify onboarding and understanding of what your code is doing. PRETTY PLEASE.
+Ensure that your code is as readable as possible. In sections where necessary, include relevant comments to simplify onboarding and understanding of what your code is doing. PRETTY PLEASE.
 
 ### 2. Commit Message Convention
 
