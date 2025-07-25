@@ -2,7 +2,6 @@
   "recommendations": [
     "biomejs.biome",
     "golang.go",
-    "ms-azuretools.vscode-docker",
-    "Vercel.turbo-vsc"
+    "ms-azuretools.vscode-docker"
   ]
 }
