@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -22,21 +21,6 @@ import (
 )
 
 var startTime time.Time
-
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-func NewCustomValidator() *CustomValidator {
-	return &CustomValidator{validator: validator.New()}
-}
-
-func (cv *CustomValidator) Validate(i interface{}) error {
-	if err := cv.validator.Struct(i); err != nil {
-		return err
-	}
-	return nil
-}
 
 func main() {
 	cfg, err := config.Load()
@@ -59,11 +43,7 @@ func main() {
 		}
 	}()
 
-	if err := db.AutoMigrate(
-		&models.Student{},
-		&models.Subject{},
-		&models.Exam{},
-	); err != nil {
+	if err := db.AutoMigrate(models.GetAllModels()...); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
