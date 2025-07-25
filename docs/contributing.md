@@ -4,7 +4,7 @@ This document provides guidelines for contributing to this project. Please read 
 
 ## Contribution Workflow
 
-Ensure you have the [necessary prerequisites](./get-started.md#prerequisites) and follow the [setup guidline](./get-started.md#setup)
+Ensure you have the [necessary prerequisites](./get-started.md#prerequisites) and follow the [setup guideline](./get-started.md#setup)
 
 ## Coding Style and Conventions
 
