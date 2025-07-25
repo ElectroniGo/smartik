@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "$(go env GOPATH)/air -c ./.air.toml",
+		"dev": "$(go env GOPATH)/bin/air -c ./.air.toml",
 		"build": "go build -o ./build/api ./cmd/api/",
 		"test": "go test -v ./... -coverprofile=coverage.out",
 		"lint": "golangci-lint run --fix",
