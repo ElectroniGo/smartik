@@ -31,7 +31,7 @@ func init() {
 			log.Fatal("Failed to migrate database:", err)
 		}
 
-		// Seed he database with initial data if needed
+		// Seed the database with initial data if needed
 		if err := repository.SeedDatabase(db); err != nil {
 			log.Error("Failed to seed database:", err)
 		}
