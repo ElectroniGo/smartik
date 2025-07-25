@@ -1,8 +1,7 @@
 packages:
-  - client/*
-  - server/*
+  - apps/*
+  - services/*
   - shared/*
-  - scripts # Will be implemented
 
 catalog:
   typescript: "^5.8"
