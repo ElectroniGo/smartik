@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -46,6 +47,7 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 		})
 	}
 
+	var answerScripts []*models.AnswerScript
 	errors := map[string]any{
 		"count": 0,
 	}
@@ -89,6 +91,8 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 				"message": "Failed to save answer script record",
 			})
 		}
+
+		answerScripts = append(answerScripts, answerScript)
 	}
 
 	if errors["count"].(int) > 0 {
@@ -99,8 +103,9 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "Answer scripts uploaded successfully",
-		"count":   len(data.File["answer_scripts"]),
+		"message":        "Answer scripts uploaded successfully",
+		"count":          len(data.File["answer_scripts"]),
+		"answer_scripts": answerScripts,
 	})
 }
 
@@ -139,6 +144,47 @@ func (h *AnswerScriptHandler) GetScriptById(c echo.Context) error {
 		"message":       "Answer script retrieved successfully",
 		"answer_script": answerScript,
 	})
+}
+
+func (h *AnswerScriptHandler) ServeAnswerScript(c echo.Context) error {
+	id := c.Param("id")
+	answerScript, err := h.repo.GetById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to get answer script by ID: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script",
+		})
+	}
+
+	// Fetch the file from MinIO
+	object, err := h.minioClient.GetObject(context.Background(), h.minioBucket,
+		answerScript.FileName, minio.GetObjectOptions{})
+	if err != nil {
+		log.Errorf("Failed to get object from MinIO: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script file",
+		})
+	}
+	defer object.Close()
+
+	objectInfo, err := object.Stat()
+	if err != nil {
+		log.Errorf("Failed to stat object from MinIO: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script file",
+		})
+	}
+
+	c.Response().Header().Set(echo.HeaderContentType, objectInfo.ContentType)
+	c.Response().Header().Set(echo.HeaderContentDisposition, fmt.Sprintf("inline; filename=\"%s\"", answerScript.FileName))
+
+	return c.Stream(http.StatusOK, objectInfo.ContentType, object)
 }
 
 func (h *AnswerScriptHandler) UpdateScript(c echo.Context) error {
