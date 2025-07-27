@@ -1,55 +1,98 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	minio "github.com/minio/minio-go/v7"
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
 	"gorm.io/gorm"
 )
 
 type AnswerScriptHandler struct {
-	repo *repository.AnswerScriptRepository
+	repo        *repository.AnswerScriptRepository
+	minioClient *minio.Client
 }
 
 func NewAnswerScriptHandler(repo *repository.AnswerScriptRepository,
+	minioClient *minio.Client,
 ) *AnswerScriptHandler {
-	return &AnswerScriptHandler{repo}
+	return &AnswerScriptHandler{repo, minioClient}
 }
 
 func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
-	var answerScripts []models.AnswerScript
-	if err := c.Bind(&answerScripts); err != nil {
+	data, err := c.MultipartForm()
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
-			"message": "Invalid input",
+			"message": "Invalid multipart form data",
 			"error":   err.Error(),
 		})
 	}
 
-	for i, script := range answerScripts {
-		if err := c.Validate(&script); err != nil {
+	if len(data.File["answer_scripts"]) < 1 {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "No answer scripts provided",
+		})
+	}
+
+	errors := map[string]any{
+		"count": 0,
+	}
+
+	for _, file := range data.File["answer_scripts"] {
+		src, err := file.Open()
+		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
-				"message": "Validation error",
-				"index":   i, // Index of the script that failed validation
-				"errors":  err.Error(),
+				"message": "Failed to read file",
+				"file":    file.Filename,
+				"error":   err.Error(),
+			})
+		}
+		defer src.Close()
+
+		// upload to MinIO
+		info, err := h.minioClient.PutObject(context.Background(), "answer-scripts",
+			file.Filename, src, file.Size, minio.PutObjectOptions{
+				ContentType: file.Header.Get("Content-Type"),
+			})
+		if err != nil {
+			// Saves error details for each failed upload & moves to next file
+			errors["file_name"] = map[string]any{
+				"filename": file.Filename,
+				"error":    err.Error(),
+			}
+			errors["count"] = errors["count"].(int) + 1
+			continue
+		}
+
+		// create answer script record in the database
+		answerScript := &models.AnswerScript{
+			FileName: file.Filename,
+			FileUrl:  &info.Location,
+			Status:   models.StatusUploaded,
+		}
+
+		if err := h.repo.Create(answerScript); err != nil {
+			log.Errorf("Failed to save answer script record: %v", err)
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to save answer script record",
 			})
 		}
 	}
 
-	if err := h.repo.Create(&answerScripts); err != nil {
-		log.Errorf("Failed to create answer scripts: %v", err)
-
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to create answer scripts",
+	if errors["count"].(int) > 0 {
+		return c.JSON(http.StatusPartialContent, echo.Map{
+			"message": "Some answer scripts failed to upload",
+			"errors":  errors,
 		})
 	}
 
-	return c.JSON(http.StatusCreated, echo.Map{
-		"message":        "Answer scripts created successfully",
-		"count":          len(answerScripts),
-		"answer_scripts": answerScripts,
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "Answer scripts uploaded successfully",
+		"count":   len(data.File["answer_scripts"]),
 	})
 }
 

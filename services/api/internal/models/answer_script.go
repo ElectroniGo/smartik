@@ -13,7 +13,7 @@ const (
 type AnswerScript struct {
 	BaseModel
 	FileName           string           `json:"file_name" gorm:"type:varchar(255);not null" validate:"required,min=3,max=255"`
-	FileUrl            *string          `json:"file_url" gorm:"type:text" validate:"omitempty,url"`
+	FileUrl            *string          `json:"file_url" gorm:"type:text" validate:"omitempty"`
 	StudentId          *string          `json:"student_id" gorm:"type:varchar(25)" validate:"omitempty"`
 	Student            *Student         `json:"student,omitempty" gorm:"foreignKey:StudentId;references:Id;constraint:OnDelete:SET NULL" validate:"-"`
 	SubjectId          *string          `json:"subject_id" gorm:"type:varchar(25)" validate:"omitempty"`

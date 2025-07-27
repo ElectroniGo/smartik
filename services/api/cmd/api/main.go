@@ -18,6 +18,7 @@ import (
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
 	"github.com/smartik/api/internal/repository/postgres"
+	"github.com/smartik/api/internal/service/minio"
 )
 
 var startTime time.Time
@@ -47,6 +48,14 @@ func main() {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
+	// Initialize MinIO client
+	minioClient, err := minio.NewMinioClient(cfg.MinioEnpointUrl,
+		cfg.MinioAccessId, cfg.MinioSecretKey,
+	)
+	if err != nil {
+		log.Fatalf("Failed to create MinIO client: %v", err)
+	}
+
 	// Initialize repositories and handlers
 	studentRepo := repository.NewStudentRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
@@ -56,7 +65,7 @@ func main() {
 	studentHandler := handlers.NewStudentHandler(studentRepo)
 	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
 	examHandler := handlers.NewExamHandler(examRepo)
-	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptRepo)
+	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient)
 
 	e := echo.New()
 	e.Validator = NewCustomValidator()

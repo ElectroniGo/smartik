@@ -13,13 +13,12 @@ func NewAnswerScriptRepository(db *gorm.DB) *AnswerScriptRepository {
 	return &AnswerScriptRepository{db}
 }
 
-func (r *AnswerScriptRepository) Create(answerScripts *[]models.AnswerScript) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.CreateInBatches(*answerScripts, 80).Error; err != nil {
-			return err
-		}
-		return nil
-	})
+func (r *AnswerScriptRepository) Create(answerScript *models.AnswerScript) error {
+	if err := r.db.Create(answerScript).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *AnswerScriptRepository) GetAll() (*[]models.AnswerScript, error) {
