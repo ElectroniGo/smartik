@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	minio "github.com/minio/minio-go/v7"
+	"github.com/smartik/api/internal/config"
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
 	"gorm.io/gorm"
@@ -15,12 +16,19 @@ import (
 type AnswerScriptHandler struct {
 	repo        *repository.AnswerScriptRepository
 	minioClient *minio.Client
+	minioBucket string
 }
 
 func NewAnswerScriptHandler(repo *repository.AnswerScriptRepository,
 	minioClient *minio.Client,
-) *AnswerScriptHandler {
-	return &AnswerScriptHandler{repo, minioClient}
+) (*AnswerScriptHandler, error) {
+
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	return &AnswerScriptHandler{repo, minioClient, cfg.MinioStorageBucket}, nil
 }
 
 func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
@@ -54,7 +62,7 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 		defer src.Close()
 
 		// upload to MinIO
-		info, err := h.minioClient.PutObject(context.Background(), "answer-scripts",
+		info, err := h.minioClient.PutObject(context.Background(), h.minioBucket,
 			file.Filename, src, file.Size, minio.PutObjectOptions{
 				ContentType: file.Header.Get("Content-Type"),
 			})
@@ -68,7 +76,7 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 			continue
 		}
 
-		// create answer script record in the database
+		// Create answer script record in the database
 		answerScript := &models.AnswerScript{
 			FileName: file.Filename,
 			FileUrl:  &info.Location,

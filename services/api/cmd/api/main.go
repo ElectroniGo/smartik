@@ -53,7 +53,7 @@ func main() {
 		cfg.MinioAccessId, cfg.MinioSecretKey,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create MinIO client: %v", err)
+		log.Fatalf("Something went wrong: %v", err)
 	}
 
 	// Initialize repositories and handlers
@@ -65,7 +65,10 @@ func main() {
 	studentHandler := handlers.NewStudentHandler(studentRepo)
 	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
 	examHandler := handlers.NewExamHandler(examRepo)
-	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient)
+	answerScriptHandler, err := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient)
+	if err != nil {
+		log.Errorf("Failed to create answer script handler: %v", err)
+	}
 
 	e := echo.New()
 	e.Validator = NewCustomValidator()
