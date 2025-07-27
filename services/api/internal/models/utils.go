@@ -5,5 +5,6 @@ func GetAllModels() []interface{} {
 		&Student{},
 		&Subject{},
 		&Exam{},
+		&AnswerScript{},
 	}
 }

@@ -36,8 +36,8 @@ func (r *SubjectRepository) GetById(id string) (*models.Subject, error) {
 }
 
 func (r *SubjectRepository) Update(id string, data *models.UpdateSubject) (*models.Subject, error) {
-	var subject models.Subject
-	if err := r.db.Where("id = ?", id).First(&subject).Error; err != nil {
+	subject, err := r.GetById(id)
+	if err != nil {
 		return nil, err
 	}
 
@@ -45,12 +45,12 @@ func (r *SubjectRepository) Update(id string, data *models.UpdateSubject) (*mode
 		return nil, err
 	}
 
-	return &subject, nil
+	return subject, nil
 }
 
 func (r *SubjectRepository) Delete(id string) error {
-	var subject models.Subject
-	if err := r.db.Where("id = ?", id).First(&subject).Error; err != nil {
+	subject, err := r.GetById(id)
+	if err != nil {
 		return err
 	}
 

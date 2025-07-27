@@ -51,10 +51,12 @@ func main() {
 	studentRepo := repository.NewStudentRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
 	examRepo := repository.NewExamRepository(db)
+	answerScriptRepo := repository.NewAnswerScriptRepository(db)
 
 	studentHandler := handlers.NewStudentHandler(studentRepo)
 	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
 	examHandler := handlers.NewExamHandler(examRepo)
+	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptRepo)
 
 	e := echo.New()
 	e.Validator = NewCustomValidator()
@@ -97,6 +99,7 @@ func main() {
 		routes.RegisterStudentRoutes(v1, studentHandler)
 		routes.RegisterSubjectRoutes(v1, subjectHandler)
 		routes.RegisterExamRoutes(v1, examHandler)
+		routes.RegisterAsnwerScriptRoutes(v1, answerScriptHandler)
 	}
 
 	go func() {

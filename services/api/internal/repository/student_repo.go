@@ -34,8 +34,8 @@ func (r *StudentRepository) GetById(id string) (*models.Student, error) {
 }
 
 func (r *StudentRepository) Update(id string, data *models.UpdateStudent) (*models.Student, error) {
-	var student models.Student
-	if err := r.db.Where("id=?", id).First(&student).Error; err != nil {
+	student, err := r.GetById(id)
+	if err != nil {
 		return nil, err
 	}
 
@@ -43,13 +43,14 @@ func (r *StudentRepository) Update(id string, data *models.UpdateStudent) (*mode
 		return nil, err
 	}
 
-	return &student, nil
+	return student, nil
 }
 
 func (r *StudentRepository) Delete(id string) error {
-	var student models.Student
-	if err := r.db.Where("id=?", id).First(&student).Error; err != nil {
+	student, err := r.GetById(id)
+	if err != nil {
 		return err
 	}
+
 	return r.db.Delete(&student).Error
 }
