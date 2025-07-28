@@ -532,7 +532,7 @@ http://localhost:PORT/api/v1
 }
 ```
 
-#### **GET `/api/v1/scripts/{id}/file`**
+#### **GET `/api/v1/scripts/serve/{id}`**
 
 **Path Parameters:**
 - `id` (string) - The answer script's ID in the database

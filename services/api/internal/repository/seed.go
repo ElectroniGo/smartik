@@ -7,7 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// Initializes the database with seed data
 func SeedDatabase(db *gorm.DB) error {
+	// Check if the database already has data
 	var count int64
 	if err := db.Model(&models.Student{}).Count(&count).Error; err != nil {
 		return err
@@ -16,7 +18,7 @@ func SeedDatabase(db *gorm.DB) error {
 		return nil // Database already seeded
 	}
 
-	// Seed initial data
+	// Seed data for students, subjects, exams, and answer scripts
 	students := []models.Student{
 		{FirstName: "John", LastName: "Doe", ExamNumber: "JOH5196"},
 		{FirstName: "Jane", LastName: "Dwayne", ExamNumber: "JAN5196"},

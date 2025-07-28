@@ -17,13 +17,15 @@ import (
 	"github.com/smartik/api/internal/config"
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/repository/minio"
 	"github.com/smartik/api/internal/repository/postgres"
-	"github.com/smartik/api/internal/service/minio"
+	"github.com/smartik/api/internal/service"
 )
 
 var startTime time.Time
 
 func main() {
+	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		log.Warnf("Failed to load config: %v (Using defaults)", err)
@@ -50,7 +52,7 @@ func main() {
 
 	// Initialize MinIO client
 	minioClient, err := minio.NewMinioClient(cfg.MinioEndpointUrl,
-		cfg.MinioAccessId, cfg.MinioSecretKey,
+		cfg.MinioAccessId, cfg.MinioSecretKey, cfg,
 	)
 	if err != nil {
 		log.Fatalf("Something went wrong: %v", err)
@@ -62,18 +64,23 @@ func main() {
 	examRepo := repository.NewExamRepository(db)
 	answerScriptRepo := repository.NewAnswerScriptRepository(db)
 
-	studentHandler := handlers.NewStudentHandler(studentRepo)
-	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
-	examHandler := handlers.NewExamHandler(examRepo)
-	answerScriptHandler, err := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient, cfg)
-	if err != nil {
-		log.Errorf("Failed to create answer script handler: %v", err)
-	}
+	// Initialize services
+	studentService := service.NewStudentService(studentRepo)
+	subjectService := service.NewSubjectService(subjectRepo)
+	examService := service.NewExamService(examRepo)
+	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, cfg)
 
+	// Initialize handlers
+	studentHandler := handlers.NewStudentHandler(studentService)
+	subjectHandler := handlers.NewSubjectHandler(subjectService)
+	examHandler := handlers.NewExamHandler(examService)
+	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptService)
+
+	// Create Echo instance
 	e := echo.New()
 	e.Validator = NewCustomValidator()
 	addr := fmt.Sprintf(":%s", cfg.Port)
-	startTime = time.Now()
+	startTime = time.Now() // Record the start time
 
 	// Middlware
 	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
@@ -120,6 +127,7 @@ func main() {
 		}
 	}()
 
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
