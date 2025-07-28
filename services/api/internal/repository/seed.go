@@ -42,13 +42,25 @@ func SeedDatabase(db *gorm.DB) error {
 	}
 
 	exams := []models.Exam{
-		{Date: time.Now().Add(24 * 30 * time.Hour)},  // 30 days from now
-		{Date: time.Now().Add(24 * 60 * time.Hour)},  // 60 days from now
-		{Date: time.Now().Add(24 * 120 * time.Hour)}, // 120 days from now
+		{Date: time.Now().Add(24 * 30 * time.Hour), TotalMarks: 150}, // 30 days from now
+		{Date: time.Now().Add(24 * 60 * time.Hour), TotalMarks: 255}, // 60 days from now
+		{Date: time.Now().Add(24 * 120 * time.Hour), TotalMarks: 90}, // 120 days from now
 	}
 
 	for _, exam := range exams {
 		if err := db.Create(&exam).Error; err != nil {
+			return err
+		}
+	}
+
+	scripts := []models.AnswerScript{
+		{FileName: "student1.pdf"},
+		{FileName: "student_473.pdf"},
+		{FileName: "student_rejected_473.pdf"},
+	}
+
+	for _, script := range scripts {
+		if err := db.Create(&script).Error; err != nil {
 			return err
 		}
 	}

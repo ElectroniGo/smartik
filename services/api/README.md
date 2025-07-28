@@ -11,6 +11,36 @@ The smartik API service is built with:
 - **PostgreSQL** - Database
 - **Go-Nanoid** - Collision-resistant unique identifiers
 
+## Prerequisites
+
+> These services will be started automatically using docker when the development server is started. See the [air config](./.air.toml)
+
+- Minio object storage
+- PostgreSQL database
+
+## Environment
+
+| Name | Default | Description |
+| :--- | :--- | :--- |
+| GO_ENV | 'development' | The environment to be optimized for when run. |
+| SERVER_URL | 'http://localhost:1323' | The full address of the machine the API will run on |
+| PORT | '1323' | The port to listen for requests on |
+| POSTGRES_URI | 'postgresql://root:123456@localhost:5432/postgres' | A uri of a running postgres database |
+| MINIO_ENDPOINT_URL | 'localhost:9000' | The host & port number where minio will listen for connections |
+| MINIO_ACCESS_ID | 'minioadmin' | An access ID used to programmatically access a running instance of Minio |
+| MINIO_SECRET_KEY | 'minioadmin' | A secret key used to programmatically authenticate with a running instance of Minio |
+| MINIO_STORAGE_BUCKET | 'smartik' | The name of the storage bucket where scripts will be stored |
+
+## Port Mapping
+
+When the development server is running, you will have access to:
+
+| Service | Port | Default |
+| :--- | :--- | :--- |
+| **API** | The value you used for the `PORT` environment variable | `:1323` |
+| **PostgrSQL** | - | `:5432` |
+| **Minio** | - | `:9000`, `9001` | 
+
 ## Getting Started
 
 For the complete development configuration, see the [getting started guide](../../docs/getting-started.md).
@@ -20,8 +50,10 @@ For the complete development configuration, see the [getting started guide](../.
 ### Base URL
 
 ```
-http://localhost:1323/api/v1
+http://localhost:PORT/api/v1
 ```
+
+> `PORT` will be replaced by the value you chose if you modified the variable, otherwise it will stick with the default `1323`.
 
 ##### **ANY `/health`**
 
@@ -393,6 +425,236 @@ http://localhost:1323/api/v1
   "message": "Failed to create exam"
 }
 ```
+
+---
+
+#### Answer Scripts
+
+##### **POST `/api/v1/scripts/upload`**
+
+**Request:** Multipart form data with file upload
+
+**Form Fields:**
+- `answer_scripts` (file[]) - Array of answer script files to upload
+
+**Response (200 OK):**
+```json
+{
+  "message": "Answer scripts uploaded successfully",
+  "count": 2,
+  "answer_scripts": [
+    {
+      "id": "cmddih9m9000097hndiy6afpx",
+      "CreatedAt": "2025-07-22T10:30:00Z",
+      "UpdatedAt": "2025-07-22T10:30:00Z",
+      "file_name": "exam_script_001.pdf",
+      "file_url": null,
+      "student_id": null,
+      "subject_id": null,
+      "exam_id": null,
+      "total_marks": null,
+      "obtained_marks": null,
+      "scanned_exam_number": null,
+      "confidence_score": null,
+      "matched_at": null,
+      "processing_status": "uploaded"
+    }
+  ]
+}
+```
+
+**Response (207 Multi-Status):**
+```json
+{
+  "message": "Some answer scripts failed to upload",
+  "errors": {
+    "count": 1,
+    "file_name": {
+      "filename": "corrupted_file.pdf",
+      "error": "Failed to upload to MinIO storage"
+    }
+  }
+}
+```
+
+#### **GET `/api/v1/scripts`**
+
+**Response (200 OK):**
+```json
+{
+  "message": "Answer scripts retrieved successfully",
+  "answer_scripts": [
+    {
+      "id": "cmddih9m9000097hndiy6afpx",
+      "CreatedAt": "2025-07-22T10:30:00Z",
+      "UpdatedAt": "2025-07-22T10:30:00Z",
+      "file_name": "exam_script_001.pdf",
+      "file_url": null,
+      "student_id": "student_123",
+      "subject_id": "subject_456",
+      "exam_id": "exam_789",
+      "total_marks": 100,
+      "obtained_marks": 85,
+      "scanned_exam_number": "12345",
+      "confidence_score": 0.95,
+      "matched_at": "2025-07-22T10:35:00Z",
+      "processing_status": "uploaded"
+    }
+  ]
+}
+```
+
+#### **GET `/api/v1/scripts/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The answer script's ID in the database
+
+**Response (200 OK):**
+```json
+{
+  "message": "Answer script retrieved successfully",
+  "answer_script": {
+    "id": "cmddih9m9000097hndiy6afpx",
+    "CreatedAt": "2025-07-22T10:30:00Z",
+    "UpdatedAt": "2025-07-22T10:30:00Z",
+    "file_name": "exam_script_001.pdf",
+    "file_url": null,
+    "student_id": "student_123",
+    "subject_id": "subject_456",
+    "exam_id": "exam_789",
+    "total_marks": 100,
+    "obtained_marks": 85,
+    "scanned_exam_number": "12345",
+    "confidence_score": 0.95,
+    "matched_at": "2025-07-22T10:35:00Z",
+    "processing_status": "uploaded"
+  }
+}
+```
+
+#### **GET `/api/v1/scripts/{id}/file`**
+
+**Path Parameters:**
+- `id` (string) - The answer script's ID in the database
+
+**Response (200 OK):**
+Returns the actual file content with appropriate headers for inline viewing or download.
+
+**Headers:**
+- `Content-Type`: Original file MIME type
+- `Content-Disposition`: `inline; filename="original_filename.pdf"`
+
+#### **PATCH `/api/v1/scripts/update/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The answer script's ID in the database
+
+**Request Body:**
+```json
+{
+  "file_name": "string",          // optional
+  "file_url": "string",           // optional
+  "student_id": "string",         // optional
+  "subject_id": "string",         // optional
+  "exam_id": "string",            // optional
+  "total_marks": 100,             // optional
+  "obtained_marks": 85,           // optional
+  "scanned_exam_number": "string", // optional
+  "confidence_score": 0.95,       // optional
+  "matched_at": "2025-07-22T10:35:00Z" // optional, ISO format
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Answer script updated successfully",
+  "answer_script": {
+    "id": "cmddih9m9000097hndiy6afpx",
+    "CreatedAt": "2025-07-22T10:30:00Z",
+    "UpdatedAt": "2025-07-22T10:40:00Z",
+    "file_name": "updated_script.pdf",
+    "file_url": null,
+    "student_id": "student_456",
+    "subject_id": "subject_789",
+    "exam_id": "exam_123",
+    "total_marks": 100,
+    "obtained_marks": 90,
+    "scanned_exam_number": "54321",
+    "confidence_score": 0.98,
+    "matched_at": "2025-07-22T10:40:00Z",
+    "processing_status": "uploaded"
+  }
+}
+```
+
+#### **DELETE `/api/v1/scripts/delete/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The answer script's ID in the database
+
+**Response (204 No Content):**
+
+#### Errors
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Invalid multipart form data",
+  "error": "request Content-Type isn't multipart/form-data"
+}
+```
+
+```json
+{
+  "message": "No answer scripts provided"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Answer script not found"
+}
+```
+
+**Error Response (500 Internal Server Error):**
+```json
+{
+  "message": "Failed to save answer script record"
+}
+```
+
+```json
+{
+  "message": "Failed to retrieve answer scripts"
+}
+```
+
+```json
+{
+  "message": "Failed to retrieve answer script file"
+}
+```
+
+```json
+{
+  "message": "Failed to update answer script"
+}
+```
+
+```json
+{
+  "message": "Failed to delete answer script"
+}
+```
+
+```json
+{
+  "message": "Failed to delete answer script file"
+}
+```
+
 
 ---
 

@@ -1,0 +1,258 @@
+package handlers
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
+	minio "github.com/minio/minio-go/v7"
+	"github.com/smartik/api/internal/config"
+	"github.com/smartik/api/internal/models"
+	"github.com/smartik/api/internal/repository"
+	"gorm.io/gorm"
+)
+
+type AnswerScriptHandler struct {
+	repo        *repository.AnswerScriptRepository
+	minioClient *minio.Client
+	cfg         *config.Env
+}
+
+func NewAnswerScriptHandler(repo *repository.AnswerScriptRepository,
+	minioClient *minio.Client, cfg *config.Env,
+) (*AnswerScriptHandler, error) {
+	return &AnswerScriptHandler{repo, minioClient, cfg}, nil
+}
+
+func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
+	data, err := c.MultipartForm()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid multipart form data",
+			"error":   err.Error(),
+		})
+	}
+
+	if len(data.File["answer_scripts"]) < 1 {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "No answer scripts provided",
+		})
+	}
+
+	var answerScripts []*models.AnswerScript
+	errors := map[string]any{
+		"count": 0,
+	}
+
+	for _, file := range data.File["answer_scripts"] {
+		src, err := file.Open()
+		if err != nil {
+			// Save error details and continue to next file
+			errors["file"] = map[string]any{
+				"filename": file.Filename,
+				"error":    err.Error(),
+			}
+			errors["count"] = errors["count"].(int) + 1
+			continue
+		}
+
+		// upload to MinIO
+		_, err = h.minioClient.PutObject(context.Background(), h.cfg.MinioStorageBucket,
+			file.Filename, src, file.Size, minio.PutObjectOptions{
+				ContentType: file.Header.Get("Content-Type"),
+			})
+		src.Close()
+
+		if err != nil {
+			// Saves error details for each failed upload & moves to next file
+			errors["file_name"] = map[string]any{
+				"filename": file.Filename,
+				"error":    err.Error(),
+			}
+			errors["count"] = errors["count"].(int) + 1
+			continue
+		}
+
+		// Create answer script record in the database
+		answerScript := &models.AnswerScript{
+			FileName: file.Filename,
+			Status:   models.StatusUploaded,
+		}
+
+		if err := h.repo.Create(answerScript); err != nil {
+			log.Errorf("Failed to save answer script record: %v", err)
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to save answer script record",
+			})
+		}
+
+		answerScripts = append(answerScripts, answerScript)
+	}
+
+	if errors["count"].(int) > 0 {
+		return c.JSON(http.StatusPartialContent, echo.Map{
+			"message": "Some answer scripts failed to upload",
+			"errors":  errors,
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message":        "Answer scripts uploaded successfully",
+		"count":          len(data.File["answer_scripts"]),
+		"answer_scripts": answerScripts,
+	})
+}
+
+func (h *AnswerScriptHandler) GetAllScripts(c echo.Context) error {
+	answerScripts, err := h.repo.GetAll()
+	if err != nil {
+		log.Errorf("Failed to get all answer scripts: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer scripts",
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message":        "Answer scripts retrieved successfully",
+		"answer_scripts": answerScripts,
+	})
+}
+
+func (h *AnswerScriptHandler) GetScriptById(c echo.Context) error {
+	id := c.Param("id")
+	answerScript, err := h.repo.GetById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to get answer script by ID: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script",
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message":       "Answer script retrieved successfully",
+		"answer_script": answerScript,
+	})
+}
+
+func (h *AnswerScriptHandler) ServeAnswerScript(c echo.Context) error {
+	id := c.Param("id")
+	answerScript, err := h.repo.GetById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to get answer script by ID: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script",
+		})
+	}
+
+	// Fetch the file from MinIO
+	object, err := h.minioClient.GetObject(context.Background(), h.cfg.MinioStorageBucket,
+		answerScript.FileName, minio.GetObjectOptions{})
+	if err != nil {
+		log.Errorf("Failed to get object from MinIO: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script file",
+		})
+	}
+	defer object.Close()
+
+	objectInfo, err := object.Stat()
+	if err != nil {
+		log.Errorf("Failed to stat object from MinIO: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script file",
+		})
+	}
+
+	c.Response().Header().Set(echo.HeaderContentType, objectInfo.ContentType)
+	c.Response().Header().Set(echo.HeaderContentDisposition, fmt.Sprintf("inline; filename=\"%s\"", answerScript.FileName))
+
+	return c.Stream(http.StatusOK, objectInfo.ContentType, object)
+}
+
+func (h *AnswerScriptHandler) UpdateScript(c echo.Context) error {
+	id := c.Param("id")
+
+	var updateData models.AnswerScript
+	if err := c.Bind(&updateData); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid input",
+			"error":   err.Error(),
+		})
+	}
+
+	updatedScript, err := h.repo.Update(id, &updateData)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to update answer script: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to update answer script",
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message":       "Answer script updated successfully",
+		"answer_script": updatedScript,
+	})
+}
+
+func (h *AnswerScriptHandler) DeleteScript(c echo.Context) error {
+	id := c.Param("id")
+
+	answerScript, err := h.repo.GetById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to get answer script by ID: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script",
+		})
+	}
+
+	if err := h.repo.Delete(id); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to delete answer script: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to delete answer script",
+		})
+	}
+
+	// Optionally, delete the file from MinIO
+	if err := h.minioClient.RemoveObject(context.Background(),
+		h.cfg.MinioStorageBucket, answerScript.FileName, minio.RemoveObjectOptions{},
+	); err != nil {
+		log.Errorf("Failed to delete file from Minio: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to delete answer script file",
+		})
+	}
+
+	return c.JSON(http.StatusNoContent, nil)
+}

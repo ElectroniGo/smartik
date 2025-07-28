@@ -18,6 +18,7 @@ import (
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
 	"github.com/smartik/api/internal/repository/postgres"
+	"github.com/smartik/api/internal/service/minio"
 )
 
 var startTime time.Time
@@ -47,14 +48,27 @@ func main() {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
+	// Initialize MinIO client
+	minioClient, err := minio.NewMinioClient(cfg.MinioEndpointUrl,
+		cfg.MinioAccessId, cfg.MinioSecretKey,
+	)
+	if err != nil {
+		log.Fatalf("Something went wrong: %v", err)
+	}
+
 	// Initialize repositories and handlers
 	studentRepo := repository.NewStudentRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
 	examRepo := repository.NewExamRepository(db)
+	answerScriptRepo := repository.NewAnswerScriptRepository(db)
 
 	studentHandler := handlers.NewStudentHandler(studentRepo)
 	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
 	examHandler := handlers.NewExamHandler(examRepo)
+	answerScriptHandler, err := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient, cfg)
+	if err != nil {
+		log.Errorf("Failed to create answer script handler: %v", err)
+	}
 
 	e := echo.New()
 	e.Validator = NewCustomValidator()
@@ -97,6 +111,7 @@ func main() {
 		routes.RegisterStudentRoutes(v1, studentHandler)
 		routes.RegisterSubjectRoutes(v1, subjectHandler)
 		routes.RegisterExamRoutes(v1, examHandler)
+		routes.RegisterAnswerScriptRoutes(v1, answerScriptHandler)
 	}
 
 	go func() {

@@ -35,22 +35,23 @@ func (r *ExamRepository) GetById(id string) (*models.Exam, error) {
 }
 
 func (r *ExamRepository) Update(id string, data *models.UpdateExam) (*models.Exam, error) {
-	var exam models.Exam
-	if err := r.db.Where("id = ?", id).First(&exam).Error; err != nil {
+	exam, err := r.GetById(id)
+	if err != nil {
 		return nil, err
 	}
 
-	if err := r.db.Model(&exam).Updates(&data).Error; err != nil {
+	if err := r.db.Model(&exam).Updates(data).Error; err != nil {
 		return nil, err
 	}
 
-	return &exam, nil
+	return exam, nil
 }
 
 func (r *ExamRepository) Delete(id string) error {
-	var exam models.Exam
-	if err := r.db.Where("id = ?", id).First(&exam).Error; err != nil {
+	exam, err := r.GetById(id)
+	if err != nil {
 		return err
 	}
+
 	return r.db.Delete(&exam).Error
 }
