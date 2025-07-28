@@ -111,7 +111,7 @@ func main() {
 		routes.RegisterStudentRoutes(v1, studentHandler)
 		routes.RegisterSubjectRoutes(v1, subjectHandler)
 		routes.RegisterExamRoutes(v1, examHandler)
-		routes.RegisterAsnwerScriptRoutes(v1, answerScriptHandler)
+		routes.RegisterAnswerScriptRoutes(v1, answerScriptHandler)
 	}
 
 	go func() {
