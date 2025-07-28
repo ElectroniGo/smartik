@@ -11,6 +11,26 @@ The smartik API service is built with:
 - **PostgreSQL** - Database
 - **Go-Nanoid** - Collision-resistant unique identifiers
 
+## Prerequisites
+
+> These services will be started automatically using docker when the development server is started. See the [air config](./.air.toml)
+
+- Minio object storage
+- PostgreSQL database
+
+## Environment
+
+| Name | Default | Description |
+| :--- | :--- | :--- |
+| GO_ENV | 'development' | The environment to be optimized for when run. |
+| SERVER_URL | 'http://localhost:1323' | The full address of the machine the API will run on |
+| PORT | '1323' | The port to listen for requests on |
+| POSTGRES_URI | 'postgresql://root:123456@localhost:5432/postgres' | A uri of a running postgres database |
+| MINIO_ENDPOINT_URL | 'localhost:9000' | The host & port number where minio will listen for connections |
+| MINIO_ACCESS_ID | 'minioadmin' | An access ID used to programmatically access a running instance of Minio |
+| MINIO_SECRET_KEY | 'minioadmin' | A secret key used to programmatically authenticate with a running instance of Minio |
+| MINIO_STORAGE_BUCKET | 'smartik' | The name of the storage bucket where scripts will be stored |
+
 ## Getting Started
 
 For the complete development configuration, see the [getting started guide](../../docs/getting-started.md).
