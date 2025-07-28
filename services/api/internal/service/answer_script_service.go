@@ -13,26 +13,26 @@ import (
 	"github.com/smartik/api/internal/repository"
 )
 
-// AnswerScriptService handles business logic for answer script operations
+// Handles business logic for answer script operations
 type AnswerScriptService struct {
 	repo        *repository.AnswerScriptRepository
 	minioClient *minio.Client
 	cfg         *config.Env
 }
 
-// FileUploadResult represents the result of a batch file upload operation
+// Represents the result of a batch file upload operation
 type FileUploadResult struct {
 	SuccessfulUploads []models.AnswerScript `json:"successful_uploads"`
 	FailedUploads     []FileUploadError     `json:"failed_uploads"`
 }
 
-// FileUploadError represents an error that occurred during file upload
+// Represents an error that occurred during file upload
 type FileUploadError struct {
 	Filename string `json:"filename"`
 	Error    string `json:"error"`
 }
 
-// FileStreamResult contains file stream data and metadata
+// Contains file stream data and metadata
 type FileStreamResult struct {
 	Content     io.ReadCloser
 	ContentType string
@@ -40,7 +40,7 @@ type FileStreamResult struct {
 	Size        int64
 }
 
-// NewAnswerScriptService creates a new instance of AnswerScriptService
+// Creates a new instance of AnswerScriptService
 func NewAnswerScriptService(
 	repo *repository.AnswerScriptRepository,
 	minioClient *minio.Client,
