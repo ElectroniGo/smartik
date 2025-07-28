@@ -38,6 +38,6 @@ type UpdateAnswerScript struct {
 	MaxMarks           *int              `json:"max_marks,omitempty" validate:"omitempty,numeric,min=0"`
 	ScannedExamNumber  *string           `json:"scanned_exam_number,omitempty" validate:"omitempty,min=4,max=20"`
 	Status             *ProcessingStatus `json:"processing_status,omitempty" validate:"omitempty,oneof=processing uploaded failed"` // can be 'processing', 'uploaded', or 'failed'
-	MatchingConfidence *float32          `json:"matching_confidence,omitempty" validate:"omitempty,numberic"`
+	MatchingConfidence *float32          `json:"matching_confidence,omitempty" validate:"omitempty,numeric"`
 	MatchedAt          *time.Time        `json:"matched_at,omitempty" validate:"omitempty"`
 }
