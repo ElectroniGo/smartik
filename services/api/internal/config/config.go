@@ -18,7 +18,7 @@ type Env struct {
 	ServerUrl          string
 	Port               string
 	PostgresURI        string
-	MinioEnpointUrl    string
+	MinioEndpointUrl    string
 	MinioAccessId      string
 	MinioSecretKey     string
 	MinioStorageBucket string
