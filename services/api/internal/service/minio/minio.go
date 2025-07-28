@@ -13,12 +13,14 @@ func NewMinioClient(endpointUrl, accessId, secretKey string) (*minio.Client, err
 		Creds:  credentials.NewStaticV4(accessId, secretKey, ""),
 		Secure: false,
 	})
-
-	cfg, err := config.Load()
 	if err != nil {
 		return nil, err
 	}
 
+	cfg, cfgErr := config.Load()
+	if cfgErr != nil {
+		return nil, cfgErr
+	}
 	ok, err := client.BucketExists(context.Background(), cfg.MinioStorageBucket)
 	if err != nil {
 		return nil, err
