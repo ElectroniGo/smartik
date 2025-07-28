@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// Initialize MinIO client
-	minioClient, err := minio.NewMinioClient(cfg.MinioEnpointUrl,
+	minioClient, err := minio.NewMinioClient(cfg.MinioEndpointUrl,
 		cfg.MinioAccessId, cfg.MinioSecretKey,
 	)
 	if err != nil {
