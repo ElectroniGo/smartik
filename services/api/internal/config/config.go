@@ -15,6 +15,7 @@ const (
 
 type Env struct {
 	GoEnv              GoEnv
+	ServerUrl          string
 	Port               string
 	PostgresURI        string
 	MinioEnpointUrl    string
@@ -35,6 +36,7 @@ func Load() (*Env, error) {
 
 	config := &Env{
 		GoEnv:              GoEnv(getEnv("GO_ENV", "development")),
+		ServerUrl:          getEnv("SERVER_URL", "http://localhost:1323"),
 		Port:               getEnv("PORT", "1323"),
 		PostgresURI:        getEnv("POSTGRES_URI", "postgresql://root:123456@localhost:5432/postgres"),
 		MinioEnpointUrl:    getEnv("MINIO_ENDPOINT_URL", "localhost:9000"),

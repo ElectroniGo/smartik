@@ -65,7 +65,7 @@ func main() {
 	studentHandler := handlers.NewStudentHandler(studentRepo)
 	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
 	examHandler := handlers.NewExamHandler(examRepo)
-	answerScriptHandler, err := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient)
+	answerScriptHandler, err := handlers.NewAnswerScriptHandler(answerScriptRepo, minioClient, cfg)
 	if err != nil {
 		log.Errorf("Failed to create answer script handler: %v", err)
 	}

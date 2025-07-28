@@ -17,19 +17,13 @@ import (
 type AnswerScriptHandler struct {
 	repo        *repository.AnswerScriptRepository
 	minioClient *minio.Client
-	minioBucket string
+	cfg         *config.Env
 }
 
 func NewAnswerScriptHandler(repo *repository.AnswerScriptRepository,
-	minioClient *minio.Client,
+	minioClient *minio.Client, cfg *config.Env,
 ) (*AnswerScriptHandler, error) {
-
-	cfg, err := config.Load()
-	if err != nil {
-		return nil, err
-	}
-
-	return &AnswerScriptHandler{repo, minioClient, cfg.MinioStorageBucket}, nil
+	return &AnswerScriptHandler{repo, minioClient, cfg}, nil
 }
 
 func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
@@ -55,19 +49,22 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 	for _, file := range data.File["answer_scripts"] {
 		src, err := file.Open()
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"message": "Failed to read file",
-				"file":    file.Filename,
-				"error":   err.Error(),
-			})
+			// Save error details and continue to next file
+			errors["file"] = map[string]any{
+				"filename": file.Filename,
+				"error":    err.Error(),
+			}
+			errors["count"] = errors["count"].(int) + 1
+			continue
 		}
-		defer src.Close()
 
 		// upload to MinIO
-		info, err := h.minioClient.PutObject(context.Background(), h.minioBucket,
+		_, err = h.minioClient.PutObject(context.Background(), h.cfg.MinioStorageBucket,
 			file.Filename, src, file.Size, minio.PutObjectOptions{
 				ContentType: file.Header.Get("Content-Type"),
 			})
+		src.Close()
+
 		if err != nil {
 			// Saves error details for each failed upload & moves to next file
 			errors["file_name"] = map[string]any{
@@ -81,7 +78,6 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 		// Create answer script record in the database
 		answerScript := &models.AnswerScript{
 			FileName: file.Filename,
-			FileUrl:  &info.Location,
 			Status:   models.StatusUploaded,
 		}
 
@@ -163,7 +159,7 @@ func (h *AnswerScriptHandler) ServeAnswerScript(c echo.Context) error {
 	}
 
 	// Fetch the file from MinIO
-	object, err := h.minioClient.GetObject(context.Background(), h.minioBucket,
+	object, err := h.minioClient.GetObject(context.Background(), h.cfg.MinioStorageBucket,
 		answerScript.FileName, minio.GetObjectOptions{})
 	if err != nil {
 		log.Errorf("Failed to get object from MinIO: %v", err)
@@ -220,6 +216,21 @@ func (h *AnswerScriptHandler) UpdateScript(c echo.Context) error {
 
 func (h *AnswerScriptHandler) DeleteScript(c echo.Context) error {
 	id := c.Param("id")
+
+	answerScript, err := h.repo.GetById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Answer script not found",
+			})
+		}
+
+		log.Errorf("Failed to get answer script by ID: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to retrieve answer script",
+		})
+	}
+
 	if err := h.repo.Delete(id); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -230,6 +241,16 @@ func (h *AnswerScriptHandler) DeleteScript(c echo.Context) error {
 		log.Errorf("Failed to delete answer script: %v", err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to delete answer script",
+		})
+	}
+
+	// Optionally, delete the file from MinIO
+	if err := h.minioClient.RemoveObject(context.Background(),
+		h.cfg.MinioStorageBucket, answerScript.FileName, minio.RemoveObjectOptions{},
+	); err != nil {
+		log.Errorf("Failed to delete file from Minio: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to delete answer script file",
 		})
 	}
 
