@@ -5,7 +5,7 @@ import (
 	"github.com/smartik/api/internal/api/handlers"
 )
 
-func RegisterAsnwerScriptRoutes(e *echo.Group, handlers *handlers.AnswerScriptHandler) {
+func RegisterAnswerScriptRoutes(e *echo.Group, handlers *handlers.AnswerScriptHandler) {
 	answerScripts := e.Group("/scripts")
 
 	answerScripts.POST("/upload", handlers.UploadScripts).Name = "upload_answer_scripts"
