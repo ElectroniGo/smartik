@@ -138,7 +138,7 @@ func (s *AnswerScriptService) addUploadError(result *FileUploadResult, filename,
 	})
 }
 
-// GetAll retrieves all answer scripts from the database
+// Retrieves all answer scripts from the database
 func (s *AnswerScriptService) GetAll() (*[]models.AnswerScript, error) {
 	return s.repo.GetAll()
 }
