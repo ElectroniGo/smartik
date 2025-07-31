@@ -35,10 +35,24 @@ This project is brought to you by a dedicated team of developers passionate abou
             </a>
             </td>
             <td align="center">
+            <a href="https://github.com/simacoder">
+                <img src="https://github.com/simacoder.png?size=100" width="100px;" alt="player0-glitch"/>
+                <br />
+                <sub><b>simacoder</b></sub>
+            </a>
+            </td>
+            <td align="center">
             <a href="https://github.com/makamuT">
                 <img src="https://github.com/makamuT.png?size=100" width="100px;" alt="makamuT"/>
                 <br />
                 <sub><b>makamuT</b></sub>
+            </a>
+            </td>
+            <td align="center">
+            <a href="https://github.com/directlypro">
+                <img src="https://github.com/directlypro.png?size=100" width="100px;" alt="0xlebogang"/>
+                <br />
+                <sub><b>directlypro</b></sub>
             </a>
             </td>
             <td align="center">
