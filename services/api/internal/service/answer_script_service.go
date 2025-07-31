@@ -160,14 +160,14 @@ func (s *AnswerScriptService) Delete(id string) error {
 		return err
 	}
 
-	// Delete from database
-	if err := s.repo.Delete(id); err != nil {
+	// Delete from storage (Minio)
+	if err := s.deleteFromStorage(answerScript.FileName); err != nil {
 		return err
 	}
 
-	// Delete from storage (Minio)
-	if err := s.deleteFromStorage(answerScript.FileName); err != nil {
-		log.Errorf("Failed to delete file from storage: %v", err)
+	// Delete from database
+	if err := s.repo.Delete(id); err != nil {
+		return err
 	}
 
 	return nil
