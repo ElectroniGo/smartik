@@ -6,18 +6,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/smartik/api/internal/models"
-	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/service"
 	"gorm.io/gorm"
 )
 
+// Handles HTTP requests for student operations
 type StudentHandler struct {
-	studentRepo *repository.StudentRepository
+	service *service.StudentService
 }
 
-func NewStudentHandler(repo *repository.StudentRepository) *StudentHandler {
-	return &StudentHandler{repo}
+// Creates a new instance of StudentHandler
+func NewStudentHandler(service *service.StudentService) *StudentHandler {
+	return &StudentHandler{service: service}
 }
 
+// Creates a new student record
 func (h *StudentHandler) CreateStudent(c echo.Context) error {
 	var newStudent models.Student
 	if err := c.Bind(&newStudent); err != nil {
@@ -34,9 +37,8 @@ func (h *StudentHandler) CreateStudent(c echo.Context) error {
 		})
 	}
 
-	if err := h.studentRepo.Create(&newStudent); err != nil {
+	if err := h.service.Create(&newStudent); err != nil {
 		log.Errorf("Failed to create student: %v", err)
-
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to create student",
 		})
@@ -48,8 +50,9 @@ func (h *StudentHandler) CreateStudent(c echo.Context) error {
 	})
 }
 
+// Retrieves all students from the database
 func (h *StudentHandler) GetAllStudents(c echo.Context) error {
-	students, err := h.studentRepo.GetAll()
+	students, err := h.service.GetAll()
 	if err != nil {
 		log.Errorf("Failed to retrieve students: %v", err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -63,10 +66,11 @@ func (h *StudentHandler) GetAllStudents(c echo.Context) error {
 	})
 }
 
+// Retrieves a specific student by ID
 func (h *StudentHandler) GetStudentById(c echo.Context) error {
 	id := c.Param("id")
 
-	student, err := h.studentRepo.GetById(id)
+	student, err := h.service.GetById(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -74,7 +78,7 @@ func (h *StudentHandler) GetStudentById(c echo.Context) error {
 			})
 		}
 
-		log.Errorf("Failed to get student by exam number: %v", err)
+		log.Errorf("Failed to get student by ID: %v", err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to retrieve student",
 		})
@@ -86,6 +90,7 @@ func (h *StudentHandler) GetStudentById(c echo.Context) error {
 	})
 }
 
+// Updates an existing student record
 func (h *StudentHandler) UpdateStudent(c echo.Context) error {
 	id := c.Param("id")
 	var updateData models.UpdateStudent
@@ -104,7 +109,7 @@ func (h *StudentHandler) UpdateStudent(c echo.Context) error {
 		})
 	}
 
-	updatedStudent, err := h.studentRepo.Update(id, &updateData)
+	updatedStudent, err := h.service.Update(id, &updateData)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -124,10 +129,11 @@ func (h *StudentHandler) UpdateStudent(c echo.Context) error {
 	})
 }
 
+// Removes a student from the database
 func (h *StudentHandler) DeleteStudent(c echo.Context) error {
 	id := c.Param("id")
 
-	if err := h.studentRepo.Delete(id); err != nil {
+	if err := h.service.Delete(id); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"message": "Student not found",

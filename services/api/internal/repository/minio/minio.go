@@ -8,7 +8,7 @@ import (
 	"github.com/smartik/api/internal/config"
 )
 
-func NewMinioClient(endpointUrl, accessId, secretKey string) (*minio.Client, error) {
+func NewMinioClient(endpointUrl, accessId, secretKey string, cfg *config.Env) (*minio.Client, error) {
 	client, err := minio.New(endpointUrl, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessId, secretKey, ""),
 		Secure: false,
@@ -17,10 +17,6 @@ func NewMinioClient(endpointUrl, accessId, secretKey string) (*minio.Client, err
 		return nil, err
 	}
 
-	cfg, cfgErr := config.Load()
-	if cfgErr != nil {
-		return nil, cfgErr
-	}
 	ok, err := client.BucketExists(context.Background(), cfg.MinioStorageBucket)
 	if err != nil {
 		return nil, err

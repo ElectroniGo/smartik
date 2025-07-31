@@ -6,18 +6,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/smartik/api/internal/models"
-	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/service"
 	"gorm.io/gorm"
 )
 
+// Handles HTTP requests for exam operations
 type ExamHandler struct {
-	ExamRepo *repository.ExamRepository
+	service *service.ExamService
 }
 
-func NewExamHandler(repo *repository.ExamRepository) *ExamHandler {
-	return &ExamHandler{repo}
+// Creates a new instance of ExamHandler
+func NewExamHandler(service *service.ExamService) *ExamHandler {
+	return &ExamHandler{service: service}
 }
 
+// Creates a new exam record
 func (h *ExamHandler) CreateExam(c echo.Context) error {
 	var exam models.Exam
 	if err := c.Bind(&exam); err != nil {
@@ -34,9 +37,8 @@ func (h *ExamHandler) CreateExam(c echo.Context) error {
 		})
 	}
 
-	if err := h.ExamRepo.Create(&exam); err != nil {
+	if err := h.service.Create(&exam); err != nil {
 		log.Errorf("Failed to create exam: %v", err)
-
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to create exam",
 		})
@@ -48,11 +50,11 @@ func (h *ExamHandler) CreateExam(c echo.Context) error {
 	})
 }
 
+// Retrieves all exams from the database
 func (h *ExamHandler) GetAllExams(c echo.Context) error {
-	exams, err := h.ExamRepo.GetAll()
+	exams, err := h.service.GetAll()
 	if err != nil {
 		log.Errorf("Failed to retrieve exams: %v", err)
-
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to retrieve exams",
 		})
@@ -64,9 +66,10 @@ func (h *ExamHandler) GetAllExams(c echo.Context) error {
 	})
 }
 
+// Retrieves a specific exam by ID
 func (h *ExamHandler) GetExamById(c echo.Context) error {
 	id := c.Param("id")
-	exam, err := h.ExamRepo.GetById(id)
+	exam, err := h.service.GetById(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -86,6 +89,7 @@ func (h *ExamHandler) GetExamById(c echo.Context) error {
 	})
 }
 
+// Updates an existing exam record
 func (h *ExamHandler) UpdateExam(c echo.Context) error {
 	var updateData models.UpdateExam
 	if err := c.Bind(&updateData); err != nil {
@@ -103,7 +107,7 @@ func (h *ExamHandler) UpdateExam(c echo.Context) error {
 	}
 
 	id := c.Param("id")
-	updatedExam, err := h.ExamRepo.Update(id, &updateData)
+	updatedExam, err := h.service.Update(id, &updateData)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -123,9 +127,10 @@ func (h *ExamHandler) UpdateExam(c echo.Context) error {
 	})
 }
 
+// Removes an exam from the database
 func (h *ExamHandler) DeleteExam(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.ExamRepo.Delete(id); err != nil {
+	if err := h.service.Delete(id); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"message": "Exam not found",
