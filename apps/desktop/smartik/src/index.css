@@ -1,0 +1,121 @@
+@import url("https://use.fontawesome.com/releases/v6.5.1/css/all.css");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+/*universal styles*/
+body {
+  background-color: #e8ebed;
+  color: #0e141c;
+  font-family: "Nunito Sans", sans-serif;
+  margin: auto;
+  max-width: 38rem;
+  padding: 2rem;
+}
+section{
+  margin-top: -65px;
+  height: 100vh;
+  width: 87vw;
+}
+a{
+  color: #112250;
+  text-decoration: none;
+}
+.btn{
+  background-color: #f1a805;
+  border: none;
+  border-radius: 5px;
+  color: #112250;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 900;
+  margin-left: 90px;
+  outline: none;
+  padding: 10px 15px;
+}
+.title{
+  color: #112250;
+  font-family: "Montserrat", sans-serif;
+  font-size: 2.5rem;
+  text-align: center;
+}
+/*dashboard styles*/
+.sidebar{
+  background-color: #112250;
+  height: 100vh;
+  left: 0;
+  padding: .6rem .8rem;
+  position: absolute;
+  top: 0;
+  transition: all .3 ease;
+  width: 100px;
+}
+.sidebar.active {
+  width: 220px;
+}
+.logo h4{
+  color: #cdd7df;
+  font-size: 20px;
+  opacity: 0;
+}
+.sidebar.active .logo h4{
+  opacity: 1;
+}
+#btn{
+  color: #f1a805;
+  cursor: pointer;
+  font-size: 24px;
+  left: 2.2rem;
+  position: absolute;
+  top: 1rem;
+  transition: all .5s ease;
+}
+.sidebar.active #btn{
+  left: 10rem;
+  top: .7rem;
+}
+.nav-links{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2em;
+  position: relative;
+  width: 100%;
+}
+.nav-links li{
+  height: 50px;
+  list-style: none;
+  margin: .8rem auto;
+  position: relative;
+  width: 90%;
+}
+.nav-links a{
+  align-items: center;
+  color: black;
+  border-radius: 15px;
+  display: flex;
+  height: 100%;
+  text-decoration: none;
+  width: 100%;
+}
+.nav-links li span{
+  opacity: 0;
+}
+.sidebar.active .nav-links li span{
+  opacity: 1;
+}
+.nav-links li a:hover{
+  background-color: #e8ebed;
+  color: #000;
+}
+.nav-links li a i{
+  border-radius: 12px;
+  color: #f1a805;
+  height: 50px;
+  line-height: 50px;
+  min-width: 65px;
+  text-align: center;
+}
+
+.buttons{
+  display: flex;
+  flex-direction: row;
+}
+

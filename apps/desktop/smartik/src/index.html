@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smartik-dashboard</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="logo">
+        <h4>Smartik-dashboard</h4>
+        <i class="fa-solid fa-bars" id="btn"></i>
+        <ul class="nav-links">
+          <li>
+            <a href=""><i class="fa-solid fa-users"></i><span>Students</span></i></a>
+          </li>
+          <li>
+            <a href=""><i class="fa-solid fa-chalkboard-user"></i><span>Classes</span></i></a>
+          </li>
+          <li>
+            <a href=""><i class="fa-solid fa-clipboard-list"></i><span>Exams</span></i></a>
+          </li>
+          <li>
+            <a href=""><i class="fa-solid fa-chart-bar"></i><span>Reports</span></a>
+          </li>
+          <br>
+          <br>
+          <li>
+            <a href="" class="logout"><i class="fa-solid fa-circle-left"></i> <span>Logout</span></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <section id="student">
+      <h1 class="title">Student Management</h1>
+      <div class="container">
+        <div class="buttons">
+        <button class="btn" title="add new student"><a href="newstudent.html"><i class="fa-solid fa-plus"></i><span> New</span></a></button>
+        <button class="btn" title="View all students">View all</button>
+        <button class="btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      let btn = document.getElementById('btn')
+      let sidebar = document.querySelector('.sidebar')
+      btn.addEventListener('click', () =>{
+        sidebar.classList.toggle('active')
+      })
+    </script>
+  </body>
+</html>
