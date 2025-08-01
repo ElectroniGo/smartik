@@ -13,7 +13,7 @@
             <i class="fa-solid fa-bars" id="btn"></i>
             <ul class="nav-links">
                 <li>
-                    <a href=""><i class="fa-solid fa-users"></i><span>Students</span></i></a>
+                    <a href="index.html"><i class="fa-solid fa-users"></i><span>Students</span></i></a>
                 </li>
                 <li>
                     <a href=""><i class="fa-solid fa-chalkboard-user"></i><span>Classes</span></i></a>
@@ -34,9 +34,53 @@
         </nav>
         <section>
             <h1 class="title">Add New Student</h1>
-            <div class="container">
-                
+            <div class="form-container">
+                <form id="form">
+                    <label for="examno">Exam number</label><br>
+                    <input type="text" name="examno" id="examno" placeholder="Exam Number" required><br>
+                    <label for="name">First Name</label><br>
+                    <input type="text" name="name" id="name" placeholder="First Name"><br>
+                    <label for="surname">Surname</label><br>
+                    <input type="text" name="surname" id="surname" placeholder="Surname"><br>
+                </form>
+            </div>
+            <div class="buttons">
+                <button type="submit" class="btn" id="submit">Submit</button>
+                <button class="btn"><a href="index.html">Home</a></button>
             </div>
         </section>
+        <script>
+            let root = "http://localhost:1323/api/v1/";
+            document.getElementById('submit').addEventListener('click', submitForm);
+            function submitForm(e){
+                e.preventDefault();
+                const formElement = document.querySelector('#form');
+                const data = {
+                    examno: formElement.examno.value,
+                    name: formElement.name.value,
+                    surname: formElement.surname.value
+                };
+
+                fetch(root + 'students/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                })
+                .then(function(response) {
+                    if (!response.ok){
+                        throw new Error(`HTTP error! status: ${response.status}`)
+                    }
+                    return response.text();
+                })
+                .then(function (data) {
+                    if (data == "1") {
+                        alert("Student added.");
+                        document.getElementById('form').reset();
+                    } else {
+                        alert(data);
+                    }
+                });
+            }
+        </script>
 </body>
 </html>

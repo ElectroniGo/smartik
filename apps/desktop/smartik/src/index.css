@@ -21,7 +21,7 @@ a{
 .btn{
   background-color: #f1a805;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
   color: #112250;
   cursor: pointer;
   font-size: 1rem;
@@ -29,6 +29,9 @@ a{
   margin-left: 90px;
   outline: none;
   padding: 10px 15px;
+}
+.btn:hover{
+  background: #cdd7df;
 }
 .title{
   color: #112250;
@@ -117,5 +120,30 @@ a{
 .buttons{
   display: flex;
   flex-direction: row;
+}
+/*Form*/
+.form-container{
+  margin-bottom: 30px;
+  margin-left: 250px;
+}
+.buttons{
+  margin-left: 120px;
+}
+input{
+  background: transparent;
+  border: 1px solid #f1a805;
+  border-radius: 25px;
+  color: #0e141c;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  outline: none;
+  padding: 5px;
+  text-align: center;
+}
+label{
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
