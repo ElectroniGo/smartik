@@ -10,7 +10,7 @@ exclude_unchanged = true
 post_cmd = ["docker stop postgres"]
 pre_cmd = [
   "docker run --rm -d --name postgres -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -p 5432:5432 postgres:14-alpine",
-  "sleep 2",
+  "sleep 3",
 ]
 
 [misc]
