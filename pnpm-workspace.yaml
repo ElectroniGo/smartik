@@ -6,6 +6,5 @@ packages:
 catalog:
   typescript: "^5.8"
 
-hoist: false
-hoistWorkspacePackages: false
+node-linker: "hoisted"
 useNodeVersion: "22.15.1"

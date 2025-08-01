@@ -3,6 +3,11 @@
   "license": "MIT",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "shared/*",
+    "services/*"
+  ],
   "scripts": {
     "dev": "turbo dev",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,7 +19,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "turbo": "^2.5.4",
-    "typescript": "catalog:"
+    "typescript": "^5.8"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "npm@10.9.2"
 }
