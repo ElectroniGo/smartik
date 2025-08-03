@@ -20,24 +20,9 @@ type AnswerScriptService struct {
 	cfg         *config.Env
 }
 
-// Represents the result of a batch file upload operation
-type FileUploadResult struct {
+type AnswerScriptUploadResult struct {
+	UploadResult
 	SuccessfulUploads []models.AnswerScript `json:"successful_uploads"`
-	FailedUploads     []FileUploadError     `json:"failed_uploads"`
-}
-
-// Represents an error that occurred during file upload
-type FileUploadError struct {
-	Filename string `json:"filename"`
-	Error    string `json:"error"`
-}
-
-// Contains file stream data and metadata
-type FileStreamResult struct {
-	Content     io.ReadCloser
-	ContentType string
-	Filename    string
-	Size        int64
 }
 
 // Creates a new instance of AnswerScriptService
@@ -55,16 +40,18 @@ func NewAnswerScriptService(
 
 // Handles the upload of multiple answer script files
 // Processes each file individually and returns a summary of successes and failures
-func (s *AnswerScriptService) UploadFiles(files []*multipart.FileHeader) (*FileUploadResult, error) {
-	result := &FileUploadResult{
+func (s *AnswerScriptService) UploadFiles(files []*multipart.FileHeader) (*AnswerScriptUploadResult, error) {
+	result := &AnswerScriptUploadResult{
 		SuccessfulUploads: []models.AnswerScript{},
-		FailedUploads:     []FileUploadError{},
+		UploadResult: UploadResult{
+			FailedUploads: []FileUploadError{},
+		},
 	}
 
 	// Process each file individually
 	for _, file := range files {
 		if err := s.uploadSingleFile(file, result); err != nil {
-			log.Errorf("Failed to process file %s: %v", file.Filename, err)
+			continue // error handled by in `uploadSingleFile
 		}
 	}
 
@@ -72,7 +59,7 @@ func (s *AnswerScriptService) UploadFiles(files []*multipart.FileHeader) (*FileU
 }
 
 // Processes a single file upload with proper error handling and rollback
-func (s *AnswerScriptService) uploadSingleFile(file *multipart.FileHeader, result *FileUploadResult) error {
+func (s *AnswerScriptService) uploadSingleFile(file *multipart.FileHeader, result *AnswerScriptUploadResult) error {
 	src, err := file.Open()
 	if err != nil {
 		s.addUploadError(result, file.Filename, "Failed to open file: "+err.Error())
@@ -131,7 +118,7 @@ func (s *AnswerScriptService) deleteFromStorage(filename string) error {
 }
 
 // Helper method to add upload errors to the result
-func (s *AnswerScriptService) addUploadError(result *FileUploadResult, filename, errorMsg string) {
+func (s *AnswerScriptService) addUploadError(result *AnswerScriptUploadResult, filename, errorMsg string) {
 	result.FailedUploads = append(result.FailedUploads, FileUploadError{
 		Filename: filename,
 		Error:    errorMsg,

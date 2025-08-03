@@ -58,7 +58,7 @@ func (h *AnswerScriptHandler) UploadScripts(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
+	return c.JSON(http.StatusCreated, echo.Map{
 		"message":        "Answer scripts uploaded successfully",
 		"count":          len(result.SuccessfulUploads),
 		"answer_scripts": result.SuccessfulUploads,
