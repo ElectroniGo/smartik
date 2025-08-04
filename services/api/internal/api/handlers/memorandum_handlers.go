@@ -111,7 +111,7 @@ func (h *MemorandumHandler) GetMemorandumById(c echo.Context) error {
 	})
 }
 
-// Handlets the serving of a memorandum file
+// Handles the serving of a memorandum file
 func (h *MemorandumHandler) ServeMemorandumFile(c echo.Context) error {
 	id := c.Param("id")
 
