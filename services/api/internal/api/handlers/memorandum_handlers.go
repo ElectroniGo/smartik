@@ -37,7 +37,14 @@ func (h *MemorandumHandler) UploadMemorandum(c echo.Context) error {
 		})
 	}
 
-	examId := form.Value["exam_id"][0]
+	examIdSlice, ok := form.Value["exam_id"]
+	if !ok || len(examIdSlice) == 0 {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "No exam_id provided",
+		})
+	}
+
+	examId := examIdSlice[0]
 
 	result, err := h.service.UploadFile(file[0], examId, &service.MemorandumUploadResult{})
 	if err != nil {
