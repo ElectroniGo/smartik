@@ -57,7 +57,7 @@ func (s *MemorandumService) UploadFile(file *multipart.FileHeader, examId string
 	}
 
 	if err := s.repo.Create(memorandum); err != nil {
-		if deleteErr := s.repo.Delete(file.Filename); deleteErr != nil {
+		if deleteErr := s.repo.Delete(memorandum.Id); deleteErr != nil {
 			log.Errorf("Failed to delete memorandum record after upload error: %v", deleteErr)
 		}
 		result.addUploadError(file.Filename, "Failed to open file: "+err.Error())
