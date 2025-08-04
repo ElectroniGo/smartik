@@ -6,5 +6,6 @@ func GetAllModels() []interface{} {
 		&Subject{},
 		&Exam{},
 		&AnswerScript{},
+		&Memorandum{},
 	}
 }

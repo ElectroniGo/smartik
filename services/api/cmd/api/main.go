@@ -63,18 +63,21 @@ func main() {
 	subjectRepo := repository.NewSubjectRepository(db)
 	examRepo := repository.NewExamRepository(db)
 	answerScriptRepo := repository.NewAnswerScriptRepository(db)
+	memorandumRepo := repository.NewMemorandumRepository(db)
 
 	// Initialize services
 	studentService := service.NewStudentService(studentRepo)
 	subjectService := service.NewSubjectService(subjectRepo)
 	examService := service.NewExamService(examRepo)
 	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, cfg)
+	memorandumService := service.NewMemorandumService(memorandumRepo, minioClient, cfg)
 
 	// Initialize handlers
 	studentHandler := handlers.NewStudentHandler(studentService)
 	subjectHandler := handlers.NewSubjectHandler(subjectService)
 	examHandler := handlers.NewExamHandler(examService)
 	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptService)
+	memorandumHandler := handlers.NewMemorandumHandler(memorandumService)
 
 	// Create Echo instance
 	e := echo.New()
@@ -119,6 +122,7 @@ func main() {
 		routes.RegisterSubjectRoutes(v1, subjectHandler)
 		routes.RegisterExamRoutes(v1, examHandler)
 		routes.RegisterAnswerScriptRoutes(v1, answerScriptHandler)
+		routes.RegisterMemorandumRoutes(v1, memorandumHandler)
 	}
 
 	go func() {

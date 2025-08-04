@@ -655,6 +655,230 @@ Returns the actual file content with appropriate headers for inline viewing or d
 }
 ```
 
+---
+
+#### Memorandums
+
+##### **POST `/api/v1/memorandums/upload`**
+
+**Request:** Multipart form data with file upload
+
+**Form Fields:**
+- `memorandum_files` (file[]) - Array of memorandum files to upload
+- `exam_id` (string) - The exam ID associated with the memorandums
+
+**Response (200 OK):**
+```json
+{
+  "message": "Memorandums uploaded successfully",
+  "count": 2,
+  "memorandums": [
+    {
+      "id": "cmddih9m9000097hndiy6afpx",
+      "CreatedAt": "2025-07-22T10:30:00Z",
+      "UpdatedAt": "2025-07-22T10:30:00Z",
+      "file_name": "memorandum_001.pdf",
+      "file_url": null,
+      "exam_id": "exam_123",
+      "subject_id": null,
+      "total_marks": null,
+      "processing_status": "uploaded"
+    }
+  ]
+}
+```
+
+**Response (207 Multi-Status):**
+```json
+{
+  "message": "Some memorandums failed to upload",
+  "successful_uploads": 1,
+  "failed_uploads": 1,
+  "errors": [
+    {
+      "filename": "corrupted_file.pdf",
+      "error": "Failed to upload to MinIO storage"
+    }
+  ],
+  "memorandums": [
+    {
+      "id": "cmddih9m9000097hndiy6afpx",
+      "CreatedAt": "2025-07-22T10:30:00Z",
+      "UpdatedAt": "2025-07-22T10:30:00Z",
+      "file_name": "memorandum_001.pdf",
+      "file_url": null,
+      "exam_id": "exam_123",
+      "subject_id": null,
+      "total_marks": null,
+      "processing_status": "uploaded"
+    }
+  ]
+}
+```
+
+#### **GET `/api/v1/memorandums`**
+
+**Response (200 OK):**
+```json
+{
+  "message": "Memorandums retrieved successfully",
+  "memorandums": [
+    {
+      "id": "cmddih9m9000097hndiy6afpx",
+      "CreatedAt": "2025-07-22T10:30:00Z",
+      "UpdatedAt": "2025-07-22T10:30:00Z",
+      "file_name": "memorandum_001.pdf",
+      "file_url": null,
+      "exam_id": "exam_123",
+      "subject_id": "subject_456",
+      "total_marks": 100,
+      "processing_status": "uploaded"
+    }
+  ]
+}
+```
+
+#### **GET `/api/v1/memorandums/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The memorandum's ID in the database
+
+**Response (200 OK):**
+```json
+{
+  "message": "Memorandum retrieved successfully",
+  "memorandum": {
+    "id": "cmddih9m9000097hndiy6afpx",
+    "CreatedAt": "2025-07-22T10:30:00Z",
+    "UpdatedAt": "2025-07-22T10:30:00Z",
+    "file_name": "memorandum_001.pdf",
+    "file_url": null,
+    "exam_id": "exam_123",
+    "subject_id": "subject_456",
+    "total_marks": 100,
+    "processing_status": "uploaded"
+  }
+}
+```
+
+#### **GET `/api/v1/memorandums/serve/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The memorandum's ID in the database
+
+**Response (200 OK):**
+Returns the actual file content with appropriate headers for inline viewing or download.
+
+**Headers:**
+- `Content-Type`: Original file MIME type
+- `Content-Disposition`: `inline; filename="original_filename.pdf"`
+
+#### **PATCH `/api/v1/memorandums/update/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The memorandum's ID in the database
+
+**Request Body:**
+```json
+{
+  "file_name": "string",     // optional
+  "file_url": "string",      // optional
+  "exam_id": "string",       // optional
+  "subject_id": "string",    // optional
+  "total_marks": 100         // optional
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Memorandum updated successfully",
+  "memorandum": {
+    "id": "cmddih9m9000097hndiy6afpx",
+    "CreatedAt": "2025-07-22T10:30:00Z",
+    "UpdatedAt": "2025-07-22T10:40:00Z",
+    "file_name": "updated_memorandum.pdf",
+    "file_url": null,
+    "exam_id": "exam_456",
+    "subject_id": "subject_789",
+    "total_marks": 150,
+    "processing_status": "uploaded"
+  }
+}
+```
+
+#### **DELETE `/api/v1/memorandums/delete/{id}`**
+
+**Path Parameters:**
+- `id` (string) - The memorandum's ID in the database
+
+**Response (204 No Content):**
+
+#### Errors
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Invalid multipart form data",
+  "error": "request Content-Type isn't multipart/form-data"
+}
+```
+
+```json
+{
+  "message": "No memorandum files provided"
+}
+```
+
+```json
+{
+  "message": "exam_id is required"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Memorandum not found"
+}
+```
+
+**Error Response (500 Internal Server Error):**
+```json
+{
+  "message": "Failed to save memorandum record"
+}
+```
+
+```json
+{
+  "message": "Failed to retrieve memorandums"
+}
+```
+
+```json
+{
+  "message": "Failed to retrieve memorandum file"
+}
+```
+
+```json
+{
+  "message": "Failed to update memorandum"
+}
+```
+
+```json
+{
+  "message": "Failed to delete memorandum"
+}
+```
+
+```json
+{
+  "message": "Failed to delete memorandum file"
+}
+```
 
 ---
 
