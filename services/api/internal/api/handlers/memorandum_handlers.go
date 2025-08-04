@@ -65,7 +65,7 @@ func (h *MemorandumHandler) UploadMemorandum(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
+	return c.JSON(http.StatusCreated, echo.Map{
 		"message":            "Memorandum uploaded successfully",
 		"successful_uploads": len(result.SuccessfulUploads),
 		"memorandums":        result.SuccessfulUploads,
