@@ -17,3 +17,10 @@ type FileStreamResult struct {
 	Filename    string
 	Size        int64
 }
+
+func (u *UploadResult) addUploadError(filename, errorMsg string) {
+	u.FailedUploads = append(u.FailedUploads, FileUploadError{
+		Filename: filename,
+		Error:    errorMsg,
+	})
+}

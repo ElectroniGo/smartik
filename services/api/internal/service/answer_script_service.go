@@ -51,7 +51,7 @@ func (s *AnswerScriptService) UploadFiles(files []*multipart.FileHeader) (*Answe
 	// Process each file individually
 	for _, file := range files {
 		if err := s.uploadSingleFile(file, result); err != nil {
-			continue // error handled by in `uploadSingleFile
+			continue // error handled in `uploadSingleFile`
 		}
 	}
 
@@ -153,11 +153,7 @@ func (s *AnswerScriptService) Delete(id string) error {
 	}
 
 	// Delete from database
-	if err := s.repo.Delete(id); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.Delete(id)
 }
 
 // Retrieves a file stream from storage for serving files
