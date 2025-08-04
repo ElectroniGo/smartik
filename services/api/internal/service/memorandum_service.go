@@ -37,23 +37,20 @@ func NewMemorandumService(
 func (s *MemorandumService) UploadFile(file *multipart.FileHeader, examId string, result *MemorandumUploadResult) (*MemorandumUploadResult, error) {
 	src, err := file.Open()
 	if err != nil {
-		result.FailedUploads = append(result.FailedUploads, FileUploadError{
-			Filename: file.Filename,
-			Error:    "Failed to open file: " + err.Error(),
-		})
-		return nil, err
+		result.addUploadError(file.Filename, "Failed to open file: "+err.Error())
 	}
 	defer src.Close()
 
 	// Upload the file to MinIO
 	if err := s.uploadToStorage(file.Filename, src, file.Size, file.Header.Get("Content-Type")); err != nil {
-		result.FailedUploads = append(result.FailedUploads, FileUploadError{
-			Filename: file.Filename,
-			Error:    "Failed to upload file to storage: " + err.Error(),
-		})
+		result.addUploadError(file.Filename, "Failed to open file: "+err.Error())
 	}
 
 	// Create database record
+	//
+	// Note: We attempt the creation regardless of the upload success to
+	// enable the upload of other files that might succeed, then we respond
+	// with partial success.
 	memorandum := &models.Memorandum{
 		FileName: file.Filename,
 		ExamId:   examId,
@@ -63,10 +60,7 @@ func (s *MemorandumService) UploadFile(file *multipart.FileHeader, examId string
 		if deleteErr := s.repo.Delete(file.Filename); deleteErr != nil {
 			log.Errorf("Failed to delete memorandum record after upload error: %v", deleteErr)
 		}
-
-		result.FailedUploads = append(result.FailedUploads, FileUploadError{
-			Filename: file.Filename,
-		})
+		result.addUploadError(file.Filename, "Failed to open file: "+err.Error())
 	}
 
 	result.SuccessfulUploads = append(result.SuccessfulUploads, *memorandum)
