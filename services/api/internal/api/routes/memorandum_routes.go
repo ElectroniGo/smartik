@@ -12,6 +12,6 @@ func RegisterMemorandumRoutes(e *echo.Group, handlers *handlers.MemorandumHandle
 	memorandums.GET("", handlers.GetAllMemorandums).Name = "get_all_memorandums"
 	memorandums.GET("/:id", handlers.GetMemorandumById).Name = "get_memorandum_by_id"
 	memorandums.GET("/serve/:id", handlers.ServeMemorandumFile).Name = "serve_memorandum_file"
-	// memorandums.PATCH("/update/:id", handlers.kk).Name = "update_memorandum"
+	// TODO: Implement update functionality
 	memorandums.DELETE("/delete/:id", handlers.DeleteMemorandum).Name = "delete_memorandum"
 }
