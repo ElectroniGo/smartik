@@ -70,14 +70,14 @@ func main() {
 	subjectService := service.NewSubjectService(subjectRepo)
 	examService := service.NewExamService(examRepo)
 	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, cfg)
-	memoranumService := service.NewMemorandumService(memorandumRepo, minioClient, cfg)
+	memorandumService := service.NewMemorandumService(memorandumRepo, minioClient, cfg)
 
 	// Initialize handlers
 	studentHandler := handlers.NewStudentHandler(studentService)
 	subjectHandler := handlers.NewSubjectHandler(subjectService)
 	examHandler := handlers.NewExamHandler(examService)
 	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptService)
-	memorandumHandler := handlers.NewMemorandumHandler(memoranumService)
+	memorandumHandler := handlers.NewMemorandumHandler(memorandumService)
 
 	// Create Echo instance
 	e := echo.New()
