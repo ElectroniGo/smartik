@@ -51,9 +51,9 @@ jobs:
       
       - name: Autobuild
         if: matrix.language == 'javascript-typescript'
-        run: pnpm install && pnpm build --affected
+        run: pnpm build --affected
           
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{ matrix.language}}"
+          category: "/language:${{ matrix.language }}"
