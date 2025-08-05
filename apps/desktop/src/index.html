@@ -8,14 +8,12 @@
   <body>
     <nav class="sidebar">
       <div class="logo">
-        <h4>Smartik-dashboard</h4>
+        <img src="Vector.png">
+      </div>
         <i class="fa-solid fa-bars" id="btn"></i>
         <ul class="nav-links">
           <li>
             <a href="#student"><i class="fa-solid fa-users"></i><span>Students</span></i></a>
-          </li>
-          <li>
-            <a href=""><i class="fa-solid fa-chalkboard-user"></i><span>Classes</span></i></a>
           </li>
           <li>
             <a href=""><i class="fa-solid fa-clipboard-list"></i><span>Exams</span></i></a>
@@ -40,6 +38,28 @@
         <button class="btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
       </div>
+      <div id="students">
+        <table>
+          <tr>
+          <th>Exam Number</th>
+          <th>Pass/Fail</th>
+          <th>Edit</th>
+          <th>Delete</th>
+          </tr>
+          <tr>
+            <td>777856</td>
+            <td><i class="fa-solid fa-check"></i></td>
+            <td><i class="fa-solid fa-pen-to-square"></i></td>
+            <td><i class="fa-solid fa-trash"></i></td>
+          </tr>
+          <tr>
+            <td>777856</td>
+            <td><i class="fa-solid fa-check"></i></td>
+            <td><i class="fa-solid fa-pen-to-square"></i></td>
+            <td><i class="fa-solid fa-trash"></i></td>
+          </tr>
+        </table>
+      </div>
     </section>
 
     <script>
@@ -48,6 +68,35 @@
       btn.addEventListener('click', () =>{
         sidebar.classList.toggle('active')
       })
+      let root = "http://localhost:1323/api/v1/";
+      function fetchStudents(){
+        fetch(root + 'students')
+          .then(function (response) {
+            return response.json();
+          })
+            .then(function (data) {
+              displayStudents(data);
+            });
+        }
+        /*function displayStudents(data){
+          output = "<table>";
+            if (!data || data.length === 0) {
+            output = `<p>No students found. Please add a student to get started.</p>`;
+            }else{
+            for (a in data){
+              output += `
+                <tr onclick="editContact(${data[a].id})">
+                                <td><h5>${data[a].exam_number}</h5></td>
+                                <td><h5>${data[a].first_name}</h5></td>
+                                <td><h5>${data[a].last_name}</h5></td>   
+                            </tr>
+              `;
+            }
+          }
+            output += "</table>";
+            document.getElementById('students').innerHTML = output;
+        }
+        window.addEventListener('DOMContentLoaded', fetchStudents);*/
     </script>
   </body>
 </html>

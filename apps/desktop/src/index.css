@@ -53,12 +53,10 @@ a{
 .sidebar.active {
   width: 220px;
 }
-.logo h4{
-  color: #cdd7df;
-  font-size: 20px;
+.logo{
   opacity: 0;
 }
-.sidebar.active .logo h4{
+.sidebar.active .logo{
   opacity: 1;
 }
 #btn{
@@ -146,4 +144,25 @@ label{
   margin-bottom: 15px;
   text-align: center;
 }
-
+#students{
+  align-items: center;
+  color: #0e141c;
+  display: flex;
+  flex-direction: row;
+  margin-left: 150px;
+}
+tr{
+  background-color: #cdd7df;
+  border: 1px solid #112250;
+  color: #112250;
+  display: flex;
+  flex-direction: row;
+  font-weight: 800;
+  gap: 20px;
+}
+td{
+  color: #0e141c;
+  display: flex;
+  gap: 95px;
+  text-align: center;
+}

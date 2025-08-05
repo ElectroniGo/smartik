@@ -42,11 +42,11 @@
                     <input type="text" name="name" id="name" placeholder="First Name"><br>
                     <label for="surname">Surname</label><br>
                     <input type="text" name="surname" id="surname" placeholder="Surname"><br>
+                    <div class="buttons">
+                        <button class="btn" type="button" onclick="window.location.href='index.html'">Home</button>
+                        <button type="submit" class="btn" id="submit">Submit</button>
+                    </div>
                 </form>
-            </div>
-            <div class="buttons">
-                <button type="submit" class="btn" id="submit">Submit</button>
-                <button class="btn"><a href="index.html">Home</a></button>
             </div>
         </section>
         <script>
@@ -56,9 +56,9 @@
                 e.preventDefault();
                 const formElement = document.querySelector('#form');
                 const data = {
-                    examno: formElement.examno.value,
-                    name: formElement.name.value,
-                    surname: formElement.surname.value
+                    exam_number: formElement.examno.value,
+                    first_name: formElement.name.value,
+                    last_name: formElement.surname.value
                 };
 
                 fetch(root + 'students/create', {
