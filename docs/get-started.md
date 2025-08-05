@@ -13,8 +13,6 @@ Before you begin, please ensure you have the following software installed on you
 | [**Docker**](https://docs.docker.com/engine/install/) | `v28.x` | Required for running the application stack via Docker Compose. (Preferred installation is through install [Docker Desktop](https://docs.docker.com/desktop/)) |
 | [**Air**](https://github.com/air-verse/air?tab=readme-ov-file#installation) | `v1.62.x` | (Optional) Used for live reloading in the package & serives written in Go |
 
-> **Note on Node.js:** This project uses `pnpm` and is configured to enforce a specific Node.js version. When you run `pnpm install`, it will automatically download and use the correct version for you.
-
 ## Setup
 
 Follow these steps to get your development environment up and running.
@@ -27,7 +25,7 @@ git clone https://github.com/algoblue/smartik.git
 ```
 
 ```bash
-# Or using SSH
+# Or using SSH (Preferred)
 git clone git@github.com:algoblue/smartik.git
 ```
 
@@ -42,7 +40,7 @@ The project is a monorepo containing Go and JavaScript code.
  command will install all dependencies for the project using `pnpm` and run modified `install` scripts for each service.
 
 ```bash
-pnpm install
+npm install
 ```
 
 ## Running the Project
@@ -64,21 +62,21 @@ chmod +x ./scripts/init_dotenv.sh && ./scripts/init_dotenv.sh
 
 ```bash
 # Run all development servers
-pnpm dev
+npm dev
 ```
 
 ```bash
 # Run a specific app or services' development server
-pnpm dev --filter=PACKAGE
+npm dev --filter=PACKAGE
 ```
 
 > Replace `PACKAGE` with the name of the specific app or service, usually the name of the folder it's in. Otherwise, use the `name` field in that app or service's `package.json`
 
-### For Production (Testing out all app and services working together)
+### For Production (Testing out all apps and services working together)
 
 ```bash
 # Run all services using docker compose
-pnpm start
+npm start
 ```
 
 To stop all the running services run:
