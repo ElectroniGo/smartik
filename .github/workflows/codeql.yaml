@@ -97,7 +97,7 @@ jobs:
     - if: matrix.build-mode == 'manual'
       shell: bash
       run: |
-        pnpm build --filter="*go*"
+        pnpm build --filter="api"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
