@@ -98,6 +98,9 @@ jobs:
       shell: bash
       run: |
         pnpm build --filter="api"
+      env:
+        TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+        TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
