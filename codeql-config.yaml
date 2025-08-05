@@ -3,70 +3,19 @@ name: "Security Analysis CodeQL Configuration"
 disable-default-queries: false
 
 queries:
-  # JavaScript/TypeScript Security Queries
-  - name: javascript-typescript-security
-    uses: security-extended
-  - name: javascript-typescript-cwe
-    uses: security-and-quality
-  - uses: javascript/ql/src/Security/CWE-079/XSS.ql
-  - uses: javascript/ql/src/Security/CWE-089/SqlInjection.ql
-  - uses: javascript/ql/src/Security/CWE-078/CommandInjection.ql
-  - uses: javascript/ql/src/Security/CWE-022/TaintedPath.ql
-  - uses: javascript/ql/src/Security/CWE-798/HardcodedCredentials.ql
-  - uses: javascript/ql/src/Security/CWE-201/InformationExposure.ql
-  - uses: javascript/ql/src/Security/CWE-020/IncompleteUrlSubstringSanitization.ql
-  - uses: javascript/ql/src/Security/CWE-116/IncompleteSanitization.ql
-  - uses: javascript/ql/src/Security/CWE-094/CodeInjection.ql
-  - uses: javascript/ql/src/Security/CWE-352/MissingCsrfMiddleware.ql
-  - uses: javascript/ql/src/Security/CWE-611/Xxe.ql
-  - uses: javascript/ql/src/Security/CWE-117/LogInjection.ql
-  - uses: javascript/ql/src/Security/CWE-776/XmlBomb.ql
-  - uses: javascript/ql/src/Security/CWE-1004/SensitiveCookieWithoutHttpOnly.ql
-  - uses: javascript/ql/src/Security/CWE-1004/SensitiveCookieWithoutSecure.ql
+  - uses: security-extended
+  - uses: security-and-quality
 
-  # Go Security Queries
-  - name: go-security
-    uses: security-extended
-  - name: go-cwe
-    uses: security-and-quality
-  - uses: go/ql/src/Security/CWE-089/SqlInjection.ql
-  - uses: go/ql/src/Security/CWE-078/CommandInjection.ql
-  - uses: go/ql/src/Security/CWE-022/TaintedPath.ql
-  - uses: go/ql/src/Security/CWE-079/StoredXss.ql
-  - uses: go/ql/src/Security/CWE-079/ReflectedXss.ql
-  - uses: go/ql/src/Security/CWE-798/HardcodedCredentials.ql
-  - uses: go/ql/src/Security/CWE-020/MissingRegexpAnchor.ql
-  - uses: go/ql/src/Security/CWE-020/IncompleteUrlSubstringSanitization.ql
-  - uses: go/ql/src/Security/CWE-117/LogInjection.ql
-  - uses: go/ql/src/Security/CWE-094/CodeInjection.ql
-  - uses: go/ql/src/Security/CWE-295/InsecureRandomness.ql
-  - uses: go/ql/src/Security/CWE-338/WeakRandomness.ql
-  - uses: go/ql/src/Security/CWE-190/IntegerOverflow.ql
-  - uses: go/ql/src/Security/CWE-327/BrokenCryptoAlgorithm.ql
-  - uses: go/ql/src/Security/CWE-326/WeakCrypto.ql
-
-  # Python Security Queries
-  - name: python-security
-    uses: security-extended
-  - name: python-cwe
-    uses: security-and-quality
-  - uses: python/ql/src/Security/CWE-089/SqlInjection.ql
-  - uses: python/ql/src/Security/CWE-078/CommandInjection.ql
-  - uses: python/ql/src/Security/CWE-022/TaintedPath.ql
-  - uses: python/ql/src/Security/CWE-079/XSS.ql
-  - uses: python/ql/src/Security/CWE-798/HardcodedCredentials.ql
-  - uses: python/ql/src/Security/CWE-094/CodeInjection.ql
-  - uses: python/ql/src/Security/CWE-117/LogInjection.ql
-  - uses: python/ql/src/Security/CWE-020/IncompleteUrlSubstringSanitization.ql
-  - uses: python/ql/src/Security/CWE-611/Xxe.ql
-  - uses: python/ql/src/Security/CWE-295/RequestWithoutCertValidation.ql
-  - uses: python/ql/src/Security/CWE-327/BrokenCryptoAlgorithm.ql
-  - uses: python/ql/src/Security/CWE-326/WeakCrypto.ql
-  - uses: python/ql/src/Security/CWE-338/WeakRandomness.ql
-  - uses: python/ql/src/Security/CWE-502/UnsafeDeserialization.ql
 
 query-filters:
-  # Exclude test files and generated code
+  # Focus on security-related findings
+  - include:
+      kind: 
+        - problem
+        - path-problem
+      tags:
+        - security
+        - external/cwe
   - exclude:
       kind: problem
     where:
