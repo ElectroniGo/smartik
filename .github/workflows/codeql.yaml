@@ -3,8 +3,6 @@ name: CodeQL Analysis
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
   pull_request:
     types:
       - opened
@@ -52,7 +50,7 @@ jobs:
 
       - name: Build Go Services
         if: matrix.language.build-mode == 'manual'
-        shell: bash
+        shell: bash/fix Unexpected value 'run'
         run: |
           # List all go services
           GO_SERVICES=(
