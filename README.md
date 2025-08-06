@@ -4,6 +4,12 @@
 
 **smartik** is the automated matric script marking system you can trust! We leverage the power of Artificial Intelligence to bring speed, accuracy, and consistency to the educational assessment process.
 
+<div align="center">
+
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=electronigo)
+
+</div>
+
 ---
 
 ## About The Project
