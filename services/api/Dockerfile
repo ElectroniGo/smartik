@@ -6,7 +6,8 @@ COPY services/api/go.mod services/api/go.sum ./
 RUN go mod download
 
 COPY services/api/ .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api \
+  && chmod 555 /api
 
 
 FROM debian:bookworm-slim
@@ -20,7 +21,6 @@ RUN apt-get update && apt-get install -y \
   && useradd -r -u 1001 -g golang api
 
 COPY --from=build --chown=api:golang /api /usr/local/bin/api
-RUN chmod 555 /usr/local/bin/api
 
 USER api
 
