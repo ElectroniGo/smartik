@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
   && useradd -r -u 1001 -g golang api
 
 COPY --from=build --chown=api:golang /api /usr/local/bin/api
+RUN chmod 555 /usr/local/bin/api
 
 USER api
 
