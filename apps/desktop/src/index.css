@@ -151,18 +151,34 @@ label{
   flex-direction: row;
   margin-left: 150px;
 }
-tr{
-  background-color: #cdd7df;
-  border: 1px solid #112250;
-  color: #112250;
-  display: flex;
-  flex-direction: row;
-  font-weight: 800;
-  gap: 20px;
-}
-td{
+table, th, td{
+  border: 2px solid #112250;
+  border-collapse: collapse;
   color: #0e141c;
-  display: flex;
-  gap: 95px;
+}
+table{
+  background-color: #cdd7df;
+  margin-bottom: -200px;
   text-align: center;
+  width: 80%;
+}
+th{
+  color: #112250;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+}
+.fa-trash{
+  color: #a6171c;
+}
+.fa-check{
+  color: #87bd2a;
+}
+caption{
+  color: #112250;
+  font-family: "Montserrat", sans-serif;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 2;
+  margin-top: -60px;
+  text-transform: uppercase;
 }

@@ -1,102 +1,99 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Smartik-dashboard</title>
-    <link rel="stylesheet" href="index.css" />
-  </head>
-  <body>
-    <nav class="sidebar">
-      <div class="logo">
-        <img src="Vector.png">
-      </div>
-        <i class="fa-solid fa-bars" id="btn"></i>
-        <ul class="nav-links">
-          <li>
-            <a href="#student"><i class="fa-solid fa-users"></i><span>Students</span></i></a>
-          </li>
-          <li>
-            <a href=""><i class="fa-solid fa-clipboard-list"></i><span>Exams</span></i></a>
-          </li>
-          <li>
-            <a href=""><i class="fa-solid fa-chart-bar"></i><span>Reports</span></a>
-          </li>
-          <br>
-          <br>
-          <li>
-            <a href="" class="logout"><i class="fa-solid fa-circle-left"></i> <span>Logout</span></a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <section id="student">
-      <h1 class="title">Student Management</h1>
-      <div class="container">
-        <div class="buttons">
-        <button class="btn" title="add new student"><a href="newstudent.html"><i class="fa-solid fa-plus"></i><span> New</span></a></button>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Smartik-dashboard</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+  <nav class="sidebar">
+    <div class="logo">
+      <img src="Vector.png">
+    </div>
+    <i class="fa-solid fa-bars" id="btn"></i>
+    <ul class="nav-links">
+      <li>
+        <a href="#student"><i class="fa-solid fa-users"></i><span>Students</span></a>
+      </li>
+      <li>
+        <a href=""><i class="fa-solid fa-clipboard-list"></i><span>Exams</span></a>
+      </li>
+      <li>
+        <a href=""><i class="fa-solid fa-chart-bar"></i><span>Reports</span></a>
+      </li>
+      <br>
+      <br>
+      <li>
+        <a href="" class="logout"><i class="fa-solid fa-circle-left"></i> <span>Logout</span></a>
+      </li>
+    </ul>
+  </nav>
+  <section id="student">
+    <h1 class="title">Student Management</h1>
+    <div class="container">
+      <div class="buttons">
+        <button class="btn" title="add new student"><a href="newstudent.html"><i class="fa-solid fa-plus"></i><span>
+              New</span></a></button>
         <button class="btn" title="View all students"><a href="viewall.html">View All</a></button>
         <button class="btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
       </div>
-      <div id="students">
-        <table>
-          <tr>
-          <th>Exam Number</th>
-          <th>Pass/Fail</th>
-          <th>Edit</th>
-          <th>Delete</th>
-          </tr>
-          <tr>
-            <td>777856</td>
-            <td><i class="fa-solid fa-check"></i></td>
-            <td><i class="fa-solid fa-pen-to-square"></i></td>
-            <td><i class="fa-solid fa-trash"></i></td>
-          </tr>
-          <tr>
-            <td>777856</td>
-            <td><i class="fa-solid fa-check"></i></td>
-            <td><i class="fa-solid fa-pen-to-square"></i></td>
-            <td><i class="fa-solid fa-trash"></i></td>
-          </tr>
-        </table>
-      </div>
-    </section>
-
-    <script>
-      let btn = document.getElementById('btn')
+    </div>
+  </section>
+  <div id="message"></div>
+  <script>
+    let btn = document.getElementById('btn')
       let sidebar = document.querySelector('.sidebar')
-      btn.addEventListener('click', () =>{
+      btn.addEventListener('click', () => {
         sidebar.classList.toggle('active')
       })
       let root = "http://localhost:1323/api/v1/";
-      function fetchStudents(){
+      function fetchStudents() {
         fetch(root + 'students')
-          .then(function (response) {
-            return response.json();
-          })
-            .then(function (data) {
-              displayStudents(data);
+            .then(response => response.json()) 
+            .then(data => displayStudents(data)) 
+            .catch(error => {
+              console.error('Error fetching students:', error);
             });
         }
-        /*function displayStudents(data){
-          output = "<table>";
-            if (!data || data.length === 0) {
-            output = `<p>No students found. Please add a student to get started.</p>`;
-            }else{
-            for (a in data){
-              output += `
-                <tr onclick="editContact(${data[a].id})">
-                                <td><h5>${data[a].exam_number}</h5></td>
-                                <td><h5>${data[a].first_name}</h5></td>
-                                <td><h5>${data[a].last_name}</h5></td>   
-                            </tr>
-              `;
-            }
+        
+      function displayStudents(data){
+        let output = "";
+
+        if (!data || data.length === 0) {
+          output = `<p>No students found. Please add a student to get started.</p>`;
+        } else {
+          output = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Exam Number</th>
+                  <th>Pass/Fail</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          for (let student of data) {
+            output += `
+              <tr>
+                <td><h5>${student.exam_number}</h5></td>
+                <td>${student.pass_fail ? student.pass_fail : ''}</td>
+                <td><button onclick="edit(${student.id}); event.stopPropagation();"><i class="fa-solid fa-pen"></i></button></td>
+                <td><button onclick="deleteStudent(${student.id}); event.stopPropagation();"><i class="fa-solid fa-trash"></i></button></td>
+              </tr>
+            `;
           }
-            output += "</table>";
-            document.getElementById('students').innerHTML = output;
+          output += `
+              </tbody>
+            </table>
+          `;
         }
-        window.addEventListener('DOMContentLoaded', fetchStudents);*/
-    </script>
-  </body>
+        document.getElementById('message').innerHTML = output;
+      }
+        
+  </script>
+</body>
 </html>
