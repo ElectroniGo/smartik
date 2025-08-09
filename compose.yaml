@@ -12,8 +12,8 @@ services:
       PORT: 1323
       POSTGRES_URI: postgres://root:password@postgresdb:5432/postgres
       SERVER_URL: http://localhost:1323
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: admin123
       MINIO_ENDPOINT_URL: minio:9000
       MINIO_STORAGE_BUCKET: scripts
     depends_on:
@@ -53,12 +53,29 @@ services:
       - "9000:9000"
       - "9001:9001" # Site proxy
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123
     volumes:
       - minio_data:/data
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/ready" ]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "status" ]
       start_period: 20s
       interval: 10s
       timeout: 5s
