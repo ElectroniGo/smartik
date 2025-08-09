@@ -23,12 +23,12 @@ Follow these steps to get your development environment up and running.
 
 ```bash
 # Using HTTPS
-git clone https://github.com/algoblue/smartik.git
+git clone https://github.com/ElectroniGo/smartik.git
 ```
 
 ```bash
 # Or using SSH
-git clone git@github.com:algoblue/smartik.git
+git clone git@github.com:ElectroniGo/smartik.git
 ```
 
 ```bash
