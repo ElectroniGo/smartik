@@ -19,6 +19,7 @@ import (
 	"github.com/smartik/api/internal/repository"
 	"github.com/smartik/api/internal/repository/minio"
 	"github.com/smartik/api/internal/repository/postgres"
+	"github.com/smartik/api/internal/repository/rabbitmq"
 	"github.com/smartik/api/internal/service"
 )
 
@@ -58,6 +59,12 @@ func main() {
 		log.Fatalf("Something went wrong: %v", err)
 	}
 
+	// Initialize RabbitMQ client
+	rabbitMQClient, err := rabbitmq.NewRabbitMQClient(cfg.RabbitMQUri)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+	}
+
 	// Initialize repositories and handlers
 	studentRepo := repository.NewStudentRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
@@ -69,7 +76,7 @@ func main() {
 	studentService := service.NewStudentService(studentRepo)
 	subjectService := service.NewSubjectService(subjectRepo)
 	examService := service.NewExamService(examRepo)
-	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, cfg)
+	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, rabbitMQClient, cfg)
 	memorandumService := service.NewMemorandumService(memorandumRepo, minioClient, cfg)
 
 	// Initialize handlers

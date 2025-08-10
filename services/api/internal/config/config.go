@@ -22,6 +22,8 @@ type Env struct {
 	MinioAccessId      string
 	MinioSecretKey     string
 	MinioStorageBucket string
+	RabbitMQUri        string
+	InputQueueName     string
 }
 
 func getEnv(key, fallback string) string {
@@ -43,6 +45,8 @@ func Load() (*Env, error) {
 		MinioAccessId:      getEnv("MINIO_ACCESS_ID", "minioadmin"),
 		MinioSecretKey:     getEnv("MINIO_SECRET_KEY", "minioadmin"),
 		MinioStorageBucket: getEnv("MINIO_STORAGE_BUCKET", "smartik"),
+		RabbitMQUri:        getEnv("RABBITMQ_URI", "amqp://guest:guest@localhost:5672"),
+		InputQueueName:     getEnv("INPUT_QUEUE_NAME", "input_queue"),
 	}
 
 	return config, err

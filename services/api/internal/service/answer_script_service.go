@@ -8,16 +8,19 @@ import (
 
 	"github.com/labstack/gommon/log"
 	minio "github.com/minio/minio-go/v7"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/smartik/api/internal/config"
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/repository/rabbitmq"
 )
 
 // Handles business logic for answer script operations
 type AnswerScriptService struct {
-	repo        *repository.AnswerScriptRepository
-	minioClient *minio.Client
-	cfg         *config.Env
+	repo           *repository.AnswerScriptRepository
+	minioClient    *minio.Client
+	rabbitMQClient *amqp.Connection
+	cfg            *config.Env
 }
 
 type AnswerScriptUploadResult struct {
@@ -29,12 +32,14 @@ type AnswerScriptUploadResult struct {
 func NewAnswerScriptService(
 	repo *repository.AnswerScriptRepository,
 	minioClient *minio.Client,
+	rabbitMQClient *amqp.Connection,
 	cfg *config.Env,
 ) *AnswerScriptService {
 	return &AnswerScriptService{
-		repo:        repo,
-		minioClient: minioClient,
-		cfg:         cfg,
+		repo:           repo,
+		minioClient:    minioClient,
+		rabbitMQClient: rabbitMQClient,
+		cfg:            cfg,
 	}
 }
 
@@ -87,6 +92,16 @@ func (s *AnswerScriptService) uploadSingleFile(file *multipart.FileHeader, resul
 
 		s.addUploadError(result, file.Filename, "Failed to save to database: "+err.Error())
 		return err
+	}
+
+	fileBuffer := make([]byte, file.Size)
+	if _, err := src.Read(fileBuffer); err != nil && err != io.EOF {
+		s.addUploadError(result, file.Filename, "Failed to read file content: "+err.Error())
+		return err
+	}
+
+	if err := rabbitmq.PublishMessage(s.rabbitMQClient, s.cfg.InputQueueName, fileBuffer, file.Header.Get("Content-Type")); err != nil {
+		s.addUploadError(result, file.Filename, "Failed to publish message to RabbitMQ: "+err.Error())
 	}
 
 	// Add successful upload to result
