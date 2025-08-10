@@ -31,15 +31,21 @@
         </ul>
         </div>
     </nav>
-    <section id="student">
-        <h1 class="title">Student Management</h1>
-        <div class="container">
-            <div class="buttons">
-                <button class="btn" title="add new student"><a href="newstudent.html"><i
-                            class="fa-solid fa-plus"></i><span> New</span></a></button>
-                <button class="btn" title="View all students"><a href="viewall.html">View All</a></button>
-                <button class="btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
+    <section>
+        <h1 class="title">Add New Student</h1>
+        <div class="form-container">
+            <form id="form">
+                <label for="examno">Exam number</label><br>
+                <input type="text" name="examno" id="examno" placeholder="Exam Number" required readonly><br>
+                <label for="name">First Name</label><br>
+                <input type="text" name="name" id="name" placeholder="First Name" readonly><br>
+                <label for="surname">Surname</label><br>
+                <input type="text" name="surname" id="surname" placeholder="Surname" readonl><br>
+                <div class="buttons">
+                    <button class="btn" type="button" onclick="window.location.href='index.html'">Home</button>
+                    <button type="submit" class="btn" id="submit">Submit</button>
+                </div>
+            </form>
         </div>
     </section>
 </body>

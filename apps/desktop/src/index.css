@@ -124,8 +124,8 @@ a{
   margin-bottom: 30px;
   margin-left: 250px;
 }
-.buttons{
-  margin-left: 120px;
+.button{
+  margin-left: 50px;
 }
 input{
   background: transparent;
@@ -144,41 +144,42 @@ label{
   margin-bottom: 15px;
   text-align: center;
 }
-#students{
+/*students table*/
+.students{
   align-items: center;
   color: #0e141c;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-left: 150px;
 }
 table, th, td{
   border: 2px solid #112250;
   border-collapse: collapse;
   color: #0e141c;
-}
-table{
-  background-color: #cdd7df;
-  margin-bottom: -200px;
   text-align: center;
-  width: 80%;
+  width: 90%;
 }
 th{
   color: #112250;
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  padding: 10px;
+}
+table{
+  background-color: #cdd7df;
+  margin-left: 20px;
+  margin-top: -320px;
+  width: 100%;
+}
+button{
+  background-color: transparent;
+  border: none;
+  color: #f1a805;
+  cursor: pointer;
+}
+button i:hover{
+  color: red;
+  scale: 1.5;
 }
 .fa-trash{
   color: #a6171c;
-}
-.fa-check{
-  color: #87bd2a;
-}
-caption{
-  color: #112250;
-  font-family: "Montserrat", sans-serif;
-  font-size: 25px;
-  font-weight: 800;
-  line-height: 2;
-  margin-top: -60px;
-  text-transform: uppercase;
 }

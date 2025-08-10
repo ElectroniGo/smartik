@@ -41,7 +41,12 @@
       </div>
     </div>
   </section>
+ <section>
+  <div class="students">
+  <div id="student-body"></div>
   <div id="message"></div>
+  </div>
+ </section>
   <script>
     let btn = document.getElementById('btn')
       let sidebar = document.querySelector('.sidebar')
@@ -52,48 +57,86 @@
       function fetchStudents() {
         fetch(root + 'students')
             .then(response => response.json()) 
-            .then(data => displayStudents(data)) 
+            .then(data => {
+              console.log("Fetched data:", data);
+              const students = Array.isArray(data) ? data : data.students;
+              displayStudents(data.students);
+            })
             .catch(error => {
               console.error('Error fetching students:', error);
             });
-        }
-        
-      function displayStudents(data){
-        let output = "";
+      }
 
-        if (!data || data.length === 0) {
-          output = `<p>No students found. Please add a student to get started.</p>`;
-        } else {
-          output = `
-            <table>
-              <thead>
-                <tr>
-                  <th>Exam Number</th>
-                  <th>Pass/Fail</th>
-                  <th>Edit</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-          for (let student of data) {
-            output += `
-              <tr>
-                <td><h5>${student.exam_number}</h5></td>
-                <td>${student.pass_fail ? student.pass_fail : ''}</td>
-                <td><button onclick="edit(${student.id}); event.stopPropagation();"><i class="fa-solid fa-pen"></i></button></td>
-                <td><button onclick="deleteStudent(${student.id}); event.stopPropagation();"><i class="fa-solid fa-trash"></i></button></td>
-              </tr>
+      function displayStudents(data) {
+          let tableOutput = "";
+          let messageOutput = "";
+
+          if (!data || data.length === 0) {
+            messageOutput = `<p>No students found. Please add a student to get started.</p>`;
+          } else {
+            tableOutput = `
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Exam Number</th>
+                      <th>Edit</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+              `;
+            for (let student of data) {
+              tableOutput += `
+                  <tr>
+                    <td><h5>${student.exam_number}</h5></td>
+                    <td><button class="edit-btn" data-id="${student.id}"><i class="fa-solid fa-pen"></i></button></td>
+                    <td><button class="dlt-btn" data-id="${student.id}"><i class="fa-solid fa-trash"></i></button></td>
+                  </tr>
+                `;
+            }
+            tableOutput += `
+                </table>
             `;
           }
-          output += `
-              </tbody>
-            </table>
-          `;
+
+          document.getElementById('student-body').innerHTML = tableOutput;
+          document.getElementById('message').innerHTML = messageOutput;
+
+          // Attach event listeners here after rendering
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+              edit(this.dataset.id);
+            });
+          });
+
+          document.querySelectorAll('.dlt-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+              deleteStudent(this.dataset.id);
+            });
+          });
         }
-        document.getElementById('message').innerHTML = output;
-      }
-        
+
+        function edit(id) {
+          window.open(`edit.html?id=${id}`, "_self");
+        }
+
+        function deleteStudent(id) {
+          if (confirm("Chomi, Are you sure?")) {
+            fetch(root + 'students/delete/' + id, { method: 'DELETE' })
+              .then(response => response.text())
+              .then(data => {
+                if (data == "1") {
+                  fetchStudents();
+                } else {
+                  alert(data);
+                }
+              })
+              .catch(error => {
+                alert("Error deleting student: " + error);
+              });
+          }
+        }
+
+        fetchStudents();
   </script>
 </body>
 </html>
