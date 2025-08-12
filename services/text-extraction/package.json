@@ -1,0 +1,11 @@
+{
+  "name": "text-extraction",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "./.venv/bin/python src/main.py",
+    "install": "./.venv/bin/pip install -r requirements.txt",
+    "lint": "./.venv/bin/flake8 src/ --max-line-length=100",
+    "format": "./.venv/bin/black src/"
+  }
+}
