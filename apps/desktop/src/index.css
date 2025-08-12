@@ -12,7 +12,7 @@ body {
 section{
   margin-top: -65px;
   height: 100vh;
-  width: 87vw;
+  width: 85vw;
 }
 a{
   color: #112250;
@@ -48,7 +48,7 @@ a{
   position: absolute;
   top: 0;
   transition: all .3 ease;
-  width: 100px;
+  width: 10vw;
 }
 .sidebar.active {
   width: 220px;
@@ -104,7 +104,7 @@ a{
 }
 .nav-links li a:hover{
   background-color: #e8ebed;
-  color: #000;
+  color: #0e141c;
 }
 .nav-links li a i{
   border-radius: 12px;
@@ -118,6 +118,7 @@ a{
 .buttons{
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 /*Form*/
 .form-container{
@@ -125,7 +126,7 @@ a{
   margin-left: 250px;
 }
 .button{
-  margin-left: 50px;
+  margin-left: -75px;
 }
 input{
   background: transparent;
@@ -144,6 +145,7 @@ label{
   margin-bottom: 15px;
   text-align: center;
 }
+
 /*students table*/
 .students{
   align-items: center;
@@ -157,18 +159,18 @@ table, th, td{
   border-collapse: collapse;
   color: #0e141c;
   text-align: center;
-  width: 90%;
 }
 th{
   color: #112250;
-  font-size: 1.2rem;
-  padding: 10px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  /*width: 80vw;*/
 }
 table{
   background-color: #cdd7df;
-  margin-left: 20px;
+  margin-left: -50px;
   margin-top: -320px;
-  width: 100%;
+  width: 55vw;
 }
 button{
   background-color: transparent;
