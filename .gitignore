@@ -28,6 +28,9 @@ GEMINI.md
 # Turbo
 .turbo/
 
+# Docker persistent data
+.docker/
+
 # IDEs and editors
 .idea/
 .vscode/*

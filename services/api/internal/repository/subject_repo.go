@@ -9,14 +9,17 @@ type SubjectRepository struct {
 	db *gorm.DB
 }
 
+// Creates a new instance of SubjectRepository
 func NewSubjectRepository(db *gorm.DB) *SubjectRepository {
 	return &SubjectRepository{db}
 }
 
+// Creates a new subject record in the database
 func (r *SubjectRepository) Create(subject *models.Subject) error {
 	return r.db.Create(subject).Error
 }
 
+// Retrieves all subjects from the database
 func (r *SubjectRepository) GetAll() (*[]models.Subject, error) {
 	var subjects []models.Subject
 	if err := r.db.Find(&subjects).Error; err != nil {
@@ -26,6 +29,7 @@ func (r *SubjectRepository) GetAll() (*[]models.Subject, error) {
 	return &subjects, nil
 }
 
+// Retrieves a specific subject by its ID
 func (r *SubjectRepository) GetById(id string) (*models.Subject, error) {
 	var subject models.Subject
 	if err := r.db.Where("id=?", id).First(&subject).Error; err != nil {
@@ -35,9 +39,10 @@ func (r *SubjectRepository) GetById(id string) (*models.Subject, error) {
 	return &subject, nil
 }
 
+// Updates an existing subject record
 func (r *SubjectRepository) Update(id string, data *models.UpdateSubject) (*models.Subject, error) {
-	var subject models.Subject
-	if err := r.db.Where("id = ?", id).First(&subject).Error; err != nil {
+	subject, err := r.GetById(id)
+	if err != nil {
 		return nil, err
 	}
 
@@ -45,12 +50,13 @@ func (r *SubjectRepository) Update(id string, data *models.UpdateSubject) (*mode
 		return nil, err
 	}
 
-	return &subject, nil
+	return subject, nil
 }
 
+// Deletes a subject from the database
 func (r *SubjectRepository) Delete(id string) error {
-	var subject models.Subject
-	if err := r.db.Where("id = ?", id).First(&subject).Error; err != nil {
+	subject, err := r.GetById(id)
+	if err != nil {
 		return err
 	}
 

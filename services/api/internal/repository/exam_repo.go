@@ -9,14 +9,17 @@ type ExamRepository struct {
 	db *gorm.DB
 }
 
+// Creates a new instance of ExamRepository
 func NewExamRepository(db *gorm.DB) *ExamRepository {
 	return &ExamRepository{db}
 }
 
+// Creates a new exam record in the database
 func (r *ExamRepository) Create(exam *models.Exam) error {
 	return r.db.Create(exam).Error
 }
 
+// Retrieves all exams from the database
 func (r *ExamRepository) GetAll() (*[]models.Exam, error) {
 	var exams []models.Exam
 	if err := r.db.Find(&exams).Error; err != nil {
@@ -25,6 +28,7 @@ func (r *ExamRepository) GetAll() (*[]models.Exam, error) {
 	return &exams, nil
 }
 
+// Retrieves a specific exam by its ID
 func (r *ExamRepository) GetById(id string) (*models.Exam, error) {
 	var exam models.Exam
 	if err := r.db.Where("id = ?", id).First(&exam).Error; err != nil {
@@ -34,23 +38,26 @@ func (r *ExamRepository) GetById(id string) (*models.Exam, error) {
 	return &exam, nil
 }
 
+// Updates an existing exam record
 func (r *ExamRepository) Update(id string, data *models.UpdateExam) (*models.Exam, error) {
-	var exam models.Exam
-	if err := r.db.Where("id = ?", id).First(&exam).Error; err != nil {
+	exam, err := r.GetById(id)
+	if err != nil {
 		return nil, err
 	}
 
-	if err := r.db.Model(&exam).Updates(&data).Error; err != nil {
+	if err := r.db.Model(&exam).Updates(data).Error; err != nil {
 		return nil, err
 	}
 
-	return &exam, nil
+	return exam, nil
 }
 
+// Deletes an exam from the database
 func (r *ExamRepository) Delete(id string) error {
-	var exam models.Exam
-	if err := r.db.Where("id = ?", id).First(&exam).Error; err != nil {
+	exam, err := r.GetById(id)
+	if err != nil {
 		return err
 	}
+
 	return r.db.Delete(&exam).Error
 }

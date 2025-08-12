@@ -17,12 +17,15 @@ import (
 	"github.com/smartik/api/internal/config"
 	"github.com/smartik/api/internal/models"
 	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/repository/minio"
 	"github.com/smartik/api/internal/repository/postgres"
+	"github.com/smartik/api/internal/service"
 )
 
 var startTime time.Time
 
 func main() {
+	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		log.Warnf("Failed to load config: %v (Using defaults)", err)
@@ -47,19 +50,40 @@ func main() {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
+	// Initialize MinIO client
+	minioClient, err := minio.NewMinioClient(cfg.MinioEndpointUrl,
+		cfg.MinioAccessId, cfg.MinioSecretKey, cfg,
+	)
+	if err != nil {
+		log.Fatalf("Something went wrong: %v", err)
+	}
+
 	// Initialize repositories and handlers
 	studentRepo := repository.NewStudentRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
 	examRepo := repository.NewExamRepository(db)
+	answerScriptRepo := repository.NewAnswerScriptRepository(db)
+	memorandumRepo := repository.NewMemorandumRepository(db)
 
-	studentHandler := handlers.NewStudentHandler(studentRepo)
-	subjectHandler := handlers.NewSubjectHandler(subjectRepo)
-	examHandler := handlers.NewExamHandler(examRepo)
+	// Initialize services
+	studentService := service.NewStudentService(studentRepo)
+	subjectService := service.NewSubjectService(subjectRepo)
+	examService := service.NewExamService(examRepo)
+	answerScriptService := service.NewAnswerScriptService(answerScriptRepo, minioClient, cfg)
+	memorandumService := service.NewMemorandumService(memorandumRepo, minioClient, cfg)
 
+	// Initialize handlers
+	studentHandler := handlers.NewStudentHandler(studentService)
+	subjectHandler := handlers.NewSubjectHandler(subjectService)
+	examHandler := handlers.NewExamHandler(examService)
+	answerScriptHandler := handlers.NewAnswerScriptHandler(answerScriptService)
+	memorandumHandler := handlers.NewMemorandumHandler(memorandumService)
+
+	// Create Echo instance
 	e := echo.New()
 	e.Validator = NewCustomValidator()
 	addr := fmt.Sprintf(":%s", cfg.Port)
-	startTime = time.Now()
+	startTime = time.Now() // Record the start time
 
 	// Middlware
 	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
@@ -97,6 +121,8 @@ func main() {
 		routes.RegisterStudentRoutes(v1, studentHandler)
 		routes.RegisterSubjectRoutes(v1, subjectHandler)
 		routes.RegisterExamRoutes(v1, examHandler)
+		routes.RegisterAnswerScriptRoutes(v1, answerScriptHandler)
+		routes.RegisterMemorandumRoutes(v1, memorandumHandler)
 	}
 
 	go func() {
@@ -105,6 +131,7 @@ func main() {
 		}
 	}()
 
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit

@@ -6,18 +6,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/smartik/api/internal/models"
-	"github.com/smartik/api/internal/repository"
+	"github.com/smartik/api/internal/service"
 	"gorm.io/gorm"
 )
 
+// Handles HTTP requests for subject operations
 type SubjectHandler struct {
-	subjectRepo *repository.SubjectRepository
+	service *service.SubjectService
 }
 
-func NewSubjectHandler(repo *repository.SubjectRepository) *SubjectHandler {
-	return &SubjectHandler{repo}
+// Creates a new instance of SubjectHandler
+func NewSubjectHandler(service *service.SubjectService) *SubjectHandler {
+	return &SubjectHandler{service: service}
 }
 
+// Creates a new subject record
 func (h *SubjectHandler) CreateSubject(c echo.Context) error {
 	var subject models.Subject
 
@@ -35,9 +38,8 @@ func (h *SubjectHandler) CreateSubject(c echo.Context) error {
 		})
 	}
 
-	if err := h.subjectRepo.Create(&subject); err != nil {
+	if err := h.service.Create(&subject); err != nil {
 		log.Errorf("Failed to create subject: %v", err)
-
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to create subject",
 		})
@@ -49,11 +51,11 @@ func (h *SubjectHandler) CreateSubject(c echo.Context) error {
 	})
 }
 
+// Retrieves all subjects from the database
 func (h *SubjectHandler) GetAllSubjects(c echo.Context) error {
-	subjects, err := h.subjectRepo.GetAll()
+	subjects, err := h.service.GetAll()
 	if err != nil {
 		log.Errorf("Failed to retrieve subjects: %v", err)
-
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to retrieve subjects",
 		})
@@ -65,9 +67,10 @@ func (h *SubjectHandler) GetAllSubjects(c echo.Context) error {
 	})
 }
 
+// Retrieves a specific subject by ID
 func (h *SubjectHandler) GetSubjectById(c echo.Context) error {
 	id := c.Param("id")
-	subject, err := h.subjectRepo.GetById(id)
+	subject, err := h.service.GetById(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -87,6 +90,7 @@ func (h *SubjectHandler) GetSubjectById(c echo.Context) error {
 	})
 }
 
+// Updates an existing subject record
 func (h *SubjectHandler) UpdateSubject(c echo.Context) error {
 	id := c.Param("id")
 	var updateData models.UpdateSubject
@@ -105,7 +109,7 @@ func (h *SubjectHandler) UpdateSubject(c echo.Context) error {
 		})
 	}
 
-	updatedSubject, err := h.subjectRepo.Update(id, &updateData)
+	updatedSubject, err := h.service.Update(id, &updateData)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
@@ -125,9 +129,10 @@ func (h *SubjectHandler) UpdateSubject(c echo.Context) error {
 	})
 }
 
+// Removes a subject from the database
 func (h *SubjectHandler) DeleteSubject(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.subjectRepo.Delete(id); err != nil {
+	if err := h.service.Delete(id); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"message": "Subject not found",
