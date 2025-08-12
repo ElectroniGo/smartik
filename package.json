@@ -3,6 +3,11 @@
   "license": "MIT",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "shared/*",
+    "services/*"
+  ],
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -15,8 +20,8 @@
     "@biomejs/biome": "^2.0.6",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
-    "turbo": "^2.5.4",
-    "typescript": "catalog:"
+    "turbo": "^2.5.5",
+    "typescript": "^5.8"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "npm@10.9.2"
 }

@@ -1,13 +1,33 @@
 {
   "name": "desktop",
+  "version": "0.1.0",
   "private": true,
+  "main": "src/index.js",
+  "author": {
+    "name": "MakamuT",
+    "email": "makamuthe2@gmail.com"
+  },
   "scripts": {
-    "dev": "echo 'Add dev script here'",
-    "build": "echo 'Add build script here'",
-    "test": "echo 'Add test script here'",
-    "lint": "echo 'Add lint script here'"
+    "dev": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "api": "*"
   },
   "devDependencies": {
-    "@repo/biome-config": "workspace:*"
+    "@repo/biome-config": "*",
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-deb": "^7.8.1",
+    "@electron-forge/maker-rpm": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
+    "@electron-forge/plugin-fuses": "^7.8.1",
+    "@electron/fuses": "^1.8.0",
+    "electron": "37.2.4"
   }
 }

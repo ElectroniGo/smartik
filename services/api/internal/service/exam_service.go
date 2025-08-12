@@ -41,3 +41,4 @@ func (s *ExamService) Update(id string, updateData *models.UpdateExam) (*models.
 func (s *ExamService) Delete(id string) error {
 	return s.repo.Delete(id)
 }
+
