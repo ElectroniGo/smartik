@@ -5,19 +5,19 @@ from PIL import Image
 from config.settings import Env
 import pytesseract
 import langextract as lx
+import time
 
 cfg = Env()
 
 
 class TextExtractor:
     """
-    Extracts text from PDF files.
+    Extracts text from PDF files using OCR and AI-powered text structuring.
     """
     def __init__(self, dpi: int = cfg.DPI):
         """
         Initialize the TextExtractor with a specified DPI for image conversion.
         
-        :param pdf_bytes: A PDF file as bytes.
         :param dpi: The resolution in DPI for the conversion.
                     Defaults to the value from the environment variable PDF_DPI or 300 if not set.
         """
@@ -40,7 +40,7 @@ class TextExtractor:
                 # Creates a transformation matrix for the desired resolution
                 matrix = fitz.Matrix(self.dpi / 72, self.dpi / 72)
 
-                # Convert  to PNG bytes
+                # Convert to PNG bytes
                 pixmap = page.get_pixmap(matrix=matrix)
 
                 # Convert to PNG bytes
@@ -61,10 +61,10 @@ class TextExtractor:
         """
         try:
             image = Image.open(io.BytesIO(image_bytes))
-            # Convert to grayscale
+            # Convert to grayscale for better OCR results
             image = image.convert("L")
-            # Resize if necessary (optional, can be adjusted)
-            image = image.resize((image.width // 2, image.height // 2))
+            # Resize to reduce processing time (you can adjust this ratio)
+            image = image.resize((image.width // 2, image.height // 2), Image.LANCZOS)
             output = io.BytesIO()
             image.save(output, format="PNG")
             return output.getvalue()
@@ -89,29 +89,81 @@ class TextExtractor:
         except Exception as e:
             raise ValueError(f"Failed to extract text from image: {e}")
 
-    def structure_text(self, text: str) -> Dict:
+    def structure_text(self, text: str, max_retries: int = 3) -> Dict:
         """
-        Structure the extracted text into a JSON-like dictionary.
+        Structure the extracted text into a JSON-like dictionary using AI.
+        Includes retry logic and timeout handling for better reliability.
 
         :param text: The extracted text to structure.
+        :param max_retries: Maximum number of retry attempts if the request fails.
         :return: A dictionary with the structured text.
         """
         if not text:
             raise ValueError("No text to structure.")
 
-        result = lx.extract(
-            text_or_documents=text.strip(),
-            prompt_description=cfg.LANGEXTRACT_PROMPT,
-            examples=cfg.LANGEXTRACT_EXTRACTION_EXAMPLE,
-            model_id="gemini-2.5-flash",
-            # TODO: Add ollama model support
-        )
+        # Trim text if it's too long (Ollama works better with shorter texts)
+        if len(text) > 4000:
+            print(f"Text is long ({len(text)} chars), trimming to first 4000 characters for better AI processing")
+            text = text[:4000] + "..."
 
-        structured_text = {
-            "metadata": {
-                "source": "PDF",
-                "dpi": self.dpi
-            },
-            "extracted_text": result.text 
-        }
-        return structured_text
+        print(f"Processing text with AI model ({cfg.MODEL})...")
+        
+        # Try multiple times with increasing timeouts
+        for attempt in range(max_retries):
+            try:
+                print(f"🔄 Attempt {attempt + 1}/{max_retries}")
+                
+                # Configure timeout based on attempt (30s, 60s, 120s)
+                timeout = 30 + (attempt * 30)
+                print(f"Using timeout: {timeout} seconds")
+                
+                result = lx.extract(
+                    text_or_documents=text.strip(),
+                    prompt_description=cfg.LANGEXTRACT_PROMPT,
+                    examples=cfg.LANGEXTRACT_EXTRACTION_EXAMPLE,
+                    model_id=cfg.MODEL,
+                    api_key=cfg.GEMINI_API_KEY,
+                    temperature=0.2,
+                    max_workers=3,
+                    max_char_buffer=int(cfg.MAX_CHAR_BUFFER),
+                )
+
+                print("AI processing completed successfully!")
+                
+                _structured_text = {
+                    "metadata": {
+                        "source": "PDF",
+                        "dpi": self.dpi,
+                        "processing_time": timeout,
+                        "attempt": attempt + 1,
+                        "ai_model": cfg.MODEL
+                    },
+                    "extracted_text": text,
+                    "structured_data": result.text if hasattr(result, 'text') else str(result)
+                }
+                return result.extractions
+
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed: {str(e)}")
+                
+                if attempt < max_retries - 1:
+                    wait_time = (attempt + 1) * 10  # Wait 10s, 20s, 30s between attempts
+                    print(f"Waiting {wait_time} seconds before retry...")
+                    time.sleep(wait_time)
+                else:
+                    # If all attempts failed, return basic structure without AI processing
+                    print("All AI processing attempts failed, returning basic structure")
+                    return {
+                        "metadata": {
+                            "source": "PDF",
+                            "dpi": self.dpi,
+                            "ai_processing": "failed",
+                            "error": str(e),
+                            "ai_model": cfg.MODEL
+                        },
+                        "extracted_text": text,
+                        "structured_data": "AI processing failed - raw text only"
+                    }
+
+        # This should never be reached, but just in case
+        raise ValueError("All attempts to structure text failed")

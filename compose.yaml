@@ -9,9 +9,11 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres  # Explicitly set default database
+      POSTGRES_DB: postgres # Explicitly set default database
     ports:
       - "5432:5432"
+    networks:
+      - smartik-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U root -d postgres"]
       interval: 10s
@@ -25,6 +27,8 @@ services:
     ports:
       - "5672:5672"   # AMQP port
       - "15672:15672" # Management UI
+    networks:
+      - smartik-net
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 30s
@@ -36,14 +40,43 @@ services:
     image: quay.io/minio/minio:latest
     restart: unless-stopped
     environment:
-      MINIO_ROOT_USER: admin      # Changed from admin for consistency
-      MINIO_ROOT_PASSWORD: admin123  # Standard MinIO default
+      MINIO_ROOT_USER: admin      
+      MINIO_ROOT_PASSWORD: admin123
     ports:
       - "9000:9000"  # MinIO API
       - "9001:9001"  # MinIO Console (Web UI)
-    command: server /data --console-address ":9001"  # Fixed command syntax
+    command: server /data --console-address ":9001"
+    networks:
+      - smartik-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
+      
+# ollama:
+#   container_name: ollama
+#   image: ollama/ollama
+#   pull_policy: always
+#   restart: unless-stopped
+#   ports:
+#     - "11434:11434"
+#   networks:
+#     - smartik-net
+#   volumes:
+#     - ./.docker/ollama:/root/.ollama
+#   environment:
+#     OLLAMA_HOST: 0.0.0.0
+#     OLLAMA_KEEP_ALIVE: 5m
+#     OLLAMA_FLASH_ATTENTION: 0
+#   command: ["serve"]
+#   healthcheck:
+#     test: ["CMD", "ollama", "list"]
+#     interval: 30s
+#     timeout: 10s
+#     retries: 5
+#     start_period: 30s
+
+networks:
+  smartik-net:
+    driver: bridge
