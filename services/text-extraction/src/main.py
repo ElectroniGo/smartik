@@ -1,5 +1,4 @@
 import os
-import asyncio
 import sys
 import json
 import pika
@@ -43,22 +42,30 @@ def callback(ch, _method, _properties, body):
 
         # Structure the extracted text using AI (from text_extractor.py)
         ai_structured_text = extractor.structure_text(extracted_text)
+        
+        # Process the AI-structured results into organized exam format
+        from exam_answer_extractor import process_langextract_results
+        structured_exam_data = process_langextract_results(ai_structured_text)
+        
+        # Debug: Print individual extractions for monitoring
+        print("AI Extraction Results:")
         for item in ai_structured_text:
-            print(f"AI Structured Text: {item}\n")
+            print(f"  • {item.extraction_class}: {item.extraction_text}")
+        print(f"Total extractions: {len(ai_structured_text)}\n")
         
         # Use our helper function to organize the data into neat JSON structure
-        # organized_output = structure_output(extracted_text)
+        organized_output = structure_output(extracted_text)
         
         # Combine AI processing with our structured format
-        # final_output = {
-        #     "ai_structured_data": ai_structured_text,
-        #     "organized_questions": organized_output,
-        #     "metadata": {
-        #         "total_pages": len(page_images),
-        #         "processing_status": "completed",
-        #         "text_length": len(extracted_text)
-        #     }
-        # }
+        final_output = {
+            "ai_structured_data": structured_exam_data,
+            "organized_questions": organized_output,
+            "metadata": {
+                "total_pages": len(page_images),
+                "processing_status": "completed",
+                "text_length": len(extracted_text)
+            }
+        }
         
         # Print the structured output (you can see this in the terminal)
         print("=" * 50)
@@ -66,12 +73,12 @@ def callback(ch, _method, _properties, body):
         print("=" * 50)
         print(json.dumps(final_output, indent=2, ensure_ascii=False))
         
-        # TODO: Send final_output to the RabbitMQ output queue
-        # ch.basic_publish(
-        #     exchange='',
-        #     routing_key=cfg.OUTPUT_QUEUE,
-        #     body=json.dumps(final_output)
-        # )
+        # Send final_output to the RabbitMQ output queue
+        ch.basic_publish(
+            exchange='',
+            routing_key=cfg.OUTPUT_QUEUE,
+            body=json.dumps(final_output, ensure_ascii=False)
+        )
         
     except Exception as e:
         error_output = {
