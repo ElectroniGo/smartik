@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Smartik-upload</title>
+    <link rel="stylesheet" href="index.css" />
+    <style>
+        body{
+            align-items: center;
+            display: flex;
+            justify-content: center;
+        }
+        .wrapper{
+            background: #112250;
+            border-radius: 5px;
+            padding: 30px;
+            width: 430px;
+        }
+        .wrapper header{
+            color: #e8ebed;
+            font-size: 27px;
+            font-weight: 800;
+            text-align: center;
+        }
+        .wrapper form{
+            align-items: center;
+            border: 2px dashed #e8ebed;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 167px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        form :where(i, p){
+            color: #e8ebed;
+        }
+        form i{
+            font-size: 50px;
+        }
+        form p{
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        section .row{
+            align-items: center;
+            background: #cdd7df;
+            border-radius: 5px;
+            color: #0e141c;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px 5px;
+            width: 50vw;
+        }
+        section .row i{
+            color: #112250;
+            font-size: 30px;
+        }
+        section .details span{
+            font-size: 14px;
+        }
+        .progress-area .row .content{
+            margin-left: 15px;
+            width: 100%;
+        }
+        .progress-area .details{
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress-area .progress-bar{
+            background: #e8ebed;
+            height: 6px;
+            margin-bottom: 4px;
+            width: 100%;
+        }
+        .progress-area .progress{
+            background: #112250;
+            border-radius: inherit;
+            height: 100%;
+            width: 0%;
+        }
+        .uploaded-area{
+            max-height: 130px;
+            overflow-y: scroll;
+        }
+        .uploaded-area::-webkit-scrollbar{
+        width: 0px;
+        }
+        .uploaded-area .row .details{
+            display: flex;
+            flex-direction: column;
+            margin-left: 15px;
+        }
+        .uploaded-area .row .content{
+            align-items: center;
+            display: flex;
+        }
+        .uploaded-area .details .size{
+            font-size: 11px;
+        }
+        .uploaded-area .fa-check{
+            color: #79b425;
+            font-size: 17px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <header>Upload your matric script</header>
+    <form action="#">
+        <input type="file" class="file-input" hidden>
+        <i class="fa-solid fa-cloud-upload-alt"></i>
+        <p>Browse file to upload</p>
+    </form>
+    <section class="progress-area">
+        <li class="row">
+            <i class="fas fa-file-alt"></i>
+        <div class="content">
+        <div class="details">
+            <span class="name">File(1).pdf * Uploading</span>
+            <span class="percent">50%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        </div>
+    </li>
+    </section>
+    <section class="uploaded-area">
+        <li class="row">
+            <div class="content">
+                <i class="fas fa-file-alt"></i>
+                <div class="details">
+                    <span class="name">file(1).pdf * Uploaded</span>
+                    <span class="size">70 KB</span>
+                </div>
+            </div>
+        </li>
+    </section>
+</div>
+
+<script>
+    // Select the form and file input elements
+    const form = document.querySelector("form"),
+    fileInput = form.querySelector(".file-input"),
+    progressArea = document.querySelector(".progress-area"),
+    uploadArea = document.querySelector(".uploaded-area");
+
+    form.addEventListener("click", () =>{
+        fileInput.click();
+    });
+    
+    fileInput.onchange = ({target}) =>{
+        let file = target.files[0];
+    if(file){
+        let fileName = file.name;
+        uploadFile(fileName);
+    }
+}
+</script>
+
+</body>
+</html>
