@@ -30,7 +30,7 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            height: 167px;
+            height: 140px;
             justify-content: center;
             margin: 30px 0;
         }
@@ -74,17 +74,17 @@
         .progress-area .progress-bar{
             background: #e8ebed;
             height: 6px;
-            margin-bottom: 4px;
+            /*margin-bottom: 4px;*/
             width: 100%;
         }
         .progress-area .progress{
             background: #112250;
             border-radius: inherit;
-            height: 100%;
+            height: 40%;
             width: 0%;
         }
         .uploaded-area{
-            max-height: 130px;
+            max-height: 50px;
             overflow-y: scroll;
         }
         .uploaded-area::-webkit-scrollbar{
@@ -121,15 +121,13 @@
 </div>
 
 <script>
-    // Select the form and file input elements
     const form = document.querySelector("form"),
     fileInput = form.querySelector(".file-input"),
     progressArea = document.querySelector(".progress-area"),
-    uploadArea = document.querySelector(".uploaded-area");
+    uploadedArea = document.querySelector(".uploaded-area");
 
     const root = "http://localhost:1323/api/v1/";
-    const API = root + 'scripts/upload'; // Fixed endpoint (removed spaces)
-
+    const API = root + 'scripts/upload';
     form.addEventListener("click", () => {
         fileInput.click();
     });
@@ -156,81 +154,77 @@
         }
     };
 
-    // Upload file function
     function uploadFile(file) {
-        // Show progress UI
-        const progressUL = `<li class="row">
-            <i class="fas fa-file-alt"></i>
+            const row = document.createElement("li");
+            row.classList.add("row");
+            row.innerHTML = `
+    <i class="fas fa-file-alt"></i>
+    <div class="content">
+      <div class="details">
+        <span class="name">${file.name} • Uploading</span>
+        <span class="percent">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress" style="width: 0%"></div>
+      </div>
+    </div>
+  `;
+            progressArea.innerHTML = ""; // clear old
+            progressArea.appendChild(row);
+
+            const percentEl = row.querySelector(".percent");
+            const progressEl = row.querySelector(".progress");
+
+            const formData = new FormData();
+            formData.append("answer_scripts", file);
+
+            fetch(API, {
+                method: "POST",
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(result => {
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += Math.floor(Math.random() * 20) + 5;
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(progressInterval);
+
+                            row.innerHTML = `
             <div class="content">
-                <div class="details">
-                    <span class="name">${file.name} • Uploading</span>
-                    <span class="percent">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress" style="width: 0%"></div>
-                </div>
+              <i class="fas fa-file-alt"></i>
+              <div class="details">
+                <span class="name">${file.name} • Uploaded</span>
+                <span class="size">${(file.size / 1024).toFixed(2)} KB</span>
+              </div>
             </div>
-        </li>`;
-        progressArea.innerHTML = progressUL;
+            <i class="fas fa-check"></i>
+          `;
+                            uploadedArea.appendChild(row);
+                        }
+                        if (percentEl && progressEl) {
+                            percentEl.textContent = `${progress}%`;
+                            progressEl.style.width = `${progress}%`;
+                        }
+                    }, 150);
+                })
+                .catch(error => {
+                    console.error("Upload failed:", error);
+                    row.innerHTML = `
+        <div class="content">
+          <i class="fas fa-exclamation-circle" style="color: red;"></i>
+          <div class="details">
+            <span class="name">Upload failed for ${file.name}</span>
+          </div>
+        </div>
+      `;
+                });
+        }
 
-        // Prepare FormData
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // Send file to API
-        fetch(API, {
-            method: 'POST',
-            body: formData,
-        })
-            .then(response => {
-                if (!response.ok) {
-                    // Handle non-2xx HTTP status codes
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(result => {
-                // Simulate upload progress for a better user experience
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += Math.floor(Math.random() * 20) + 5;
-                    if (progress >= 100) {
-                        progress = 100;
-                        clearInterval(progressInterval);
-                        // Update the UI to show 'Uploaded' state
-                        const progressRow = progressArea.querySelector('.row');
-                        const uploadedHTML = `<div class="content">
-                            <i class="fas fa-file-alt"></i>
-                            <div class="details">
-                                <span class="name">${file.name} • Uploaded</span>
-                                <span class="size">${(file.size / 1024).toFixed(2)} KB</span>
-                            </div>
-                        </div>
-                        <i class="fas fa-check"></i>`;
-                        progressRow.innerHTML = uploadedHTML;
-                        uploadedArea.appendChild(progressRow);
-                    }
-                    // Update progress bar and percentage
-                    progressArea.querySelector('.percent').textContent = `${progress}%`;
-                    progressArea.querySelector('.progress').style.width = `${progress}%`;
-                }, 150);
-
-                console.log("API Response:", result);
-            })
-            .catch(error => {
-                // Handle any network or server errors
-                console.error('Upload failed:', error);
-                const progressRow = progressArea.querySelector('.row');
-                if (progressRow) {
-                    progressRow.innerHTML = `<div class="content">
-                        <i class="fas fa-exclamation-circle" style="color: red;"></i>
-                        <div class="details">
-                            <span class="name">Upload failed for ${file.name}</span>
-                        </div>
-                    </div>`;
-                }
-            });
-    }
 </script>
 
 </body>
